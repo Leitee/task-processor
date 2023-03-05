@@ -1,0 +1,21 @@
+<Project>
+
+    <PropertyGroup Label="SDK Versions">
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <Version>0.0.1</Version>
+    </PropertyGroup>
+  
+    <PropertyGroup Label="Extra Configurarion">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>1701;1702;1570;SA1600;CS0618</NoWarn>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>TaskProcessor.UnitTests</_Parameter1>			
+        </AssemblyAttribute>
+    </ItemGroup>
+
+</Project>

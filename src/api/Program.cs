@@ -1,9 +1,15 @@
+using Serilog;
+using TaskProcessor.Core;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCoreApplication(builder.Configuration);
 
 var app = builder.Build();
 
@@ -14,6 +20,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 
 var group = app.MapGroup("task");
