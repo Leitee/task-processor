@@ -1,11 +1,16 @@
 namespace TaskProcessor.Core;
-internal class Milestone
+internal class Milestone : EntityBase
 {
     public string Name { get; private set; }
-    public virtual IEnumerable<Goal>? Goals { get; private set; }
+    public virtual List<Goal>? Goals { get; private set; }
 
-    public Milestone(string name)
+    public Milestone(string name) => Name = name;
+
+    public Milestone SetGoals(params Goal[] goals)
     {
-        Name = name;
+        ArgumentNullException.ThrowIfNull(goals);
+
+        Goals!.AddRange(goals);
+        return this;
     }
 }

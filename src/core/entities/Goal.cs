@@ -1,5 +1,5 @@
 namespace TaskProcessor.Core;
-internal class Goal : EntityBase
+public class Goal : EntityBase
 {
     public string Name { get; private set; }
     public string Description { get; private set; }

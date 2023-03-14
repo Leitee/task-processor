@@ -1,34 +1,38 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TaskProcessor.Core;
-public abstract class EntityBase
+
+public interface IEntity<TId> where TId : struct
+{
+    public TId Id { get; set; }
+}
+
+public abstract class EntityBase : IEntity<Guid>
 {
     public Guid Id { get; set; }
 
-    private readonly List<BaseEvent> _domainEvents = new();
+    private readonly List<EventBase> _domainEvents = new();
 
-		protected EntityBase(Guid id) => Id = id;
+    protected EntityBase(Guid id) => Id = id;
 
-		public EntityBase() { }
+    public EntityBase() { }
 
 
-		[NotMapped]
-		public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
+    [NotMapped]
+    public IReadOnlyCollection<EventBase> DomainEvents => _domainEvents.AsReadOnly();
 
-		public void AddDomainEvent(BaseEvent domainEvent)
-		{
-			_domainEvents.Add(domainEvent);
-		}
+    public void AddDomainEvent(EventBase domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+    }
 
-		public void RemoveDomainEvent(BaseEvent domainEvent)
-		{
-			_domainEvents.Remove(domainEvent);
-		}
+    public void RemoveDomainEvent(EventBase domainEvent)
+    {
+        _domainEvents.Remove(domainEvent);
+    }
 
-		public void ClearDomainEvents()
-		{
-			_domainEvents.Clear();
-		}
+    public void ClearDomainEvents()
+    {
+        _domainEvents.Clear();
+    }
 }
