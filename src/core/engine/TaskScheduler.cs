@@ -3,9 +3,9 @@ using TaskProcessor.Core.Shared;
 
 namespace TaskProcessor.Core.Engine;
 
-public record TaskSchedulerResponse(string Message, bool HasError) : TraceableBase;
+public record TaskSchedulerResponse(string Message, bool HasError = false);
 
-public record TaskSchedulerRequest(PayloadDto payload) : IRequest<TaskSchedulerResponse>;
+public record TaskSchedulerRequest(MilestoneDto payload) : IRequest<TaskSchedulerResponse>;
 
 public class TaskScheduler : IRequestHandler<TaskSchedulerRequest, TaskSchedulerResponse>
 {
@@ -18,8 +18,13 @@ public class TaskScheduler : IRequestHandler<TaskSchedulerRequest, TaskScheduler
 
     public async Task<TaskSchedulerResponse> Handle(TaskSchedulerRequest request, CancellationToken cancellationToken)
     {
-        await _uow.GetRepository<Milestone>().
+        ArgumentNullException.ThrowIfNull(request.payload);
 
-        return Task.CompletedTask;
+        var newMilestone = new Milestone(request.payload.Name);
+           // .SetGoals(request.payload.Goals.Select(new GoalDto{ }))
+ 
+        var result = await _uow.GetRepository<Milestone>().InsertAsync(newMilestone, cancellationToken);
+
+        return new TaskSchedulerResponse("OK");
     }
 }
