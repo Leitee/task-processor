@@ -1,5 +1,5 @@
 namespace TaskProcessor.Core;
-internal class Milestone : EntityBase
+public class Milestone : EntityBase
 {
     public string Name { get; private set; }
     public virtual List<Goal>? Goals { get; private set; }

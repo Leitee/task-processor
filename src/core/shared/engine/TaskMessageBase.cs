@@ -3,7 +3,7 @@ using TaskProcessor.Core.Shared;
 
 namespace TaskProcessor.Core.Engine;
 
-public class TaskMessageBase : MessageBase
+public class TaskMessageBase<TPayload> : MessageBase where TPayload : IPayload
 {
 		private static Encoding DEFAULT_FORMAT = Encoding.UTF8;
 
@@ -16,13 +16,13 @@ public class TaskMessageBase : MessageBase
 		[JsonInclude]
 		public string Payload { get; private set; }
 
-		public TaskMessageBase(string payload)
+		public TaskMessageBase(TPayload payload)
 		{
-			ArgumentNullException.ThrowIfNullOrEmpty(payload);
+			ArgumentNullException.ThrowIfNull(payload);
 
 			CreationDate = DateTime.Now;
 			CurrentStep = new StepTask();
-			Payload = payload.EncodeBase64(DEFAULT_FORMAT)!;//TODO: store base64 encoded 
+			Payload = JsonSerializer.Serialize(payload).EncodeBase64(DEFAULT_FORMAT)!;//TODO: store base64 encoded 
 		}
 
 		public void MarkCurrentStepAsCompleted(bool result = true)
@@ -49,6 +49,6 @@ public class TaskMessageBase : MessageBase
 			}
 		}
 
-    public TPayload? GetPayload<TPayload>() where TPayload : class 
-		=> JsonSerializer.Deserialize<TPayload>(Payload.DecodeBase64(DEFAULT_FORMAT)!);
+    public TPayload? GetPayload() 
+		=> JsonSerializer.Deserialize<TPayload>(Payload.DecodeBase64(DEFAULT_FORMAT)); 
 }

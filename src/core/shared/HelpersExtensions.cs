@@ -41,23 +41,19 @@ namespace TaskProcessor.Core.Shared
             return name is null ? default : name.ToEnum<TEnum>();
         }
 
-        public static string? EncodeBase64(this string text, Encoding encoding)
+        public static string EncodeBase64(this string text, Encoding encoding)
         {
             if (string.IsNullOrEmpty(text))
-            {
-                return null;
-            }
+                return string.Empty;
 
             byte[] textAsBytes = encoding.GetBytes(text);
             return Convert.ToBase64String(textAsBytes);
         }
 
-        public static string? DecodeBase64(this string text, Encoding encoding)
+        public static string DecodeBase64(this string text, Encoding encoding)
         {
             if (string.IsNullOrEmpty(text))
-            {
-                return null;
-            }
+                return string.Empty;
 
             byte[] textAsBytes = Convert.FromBase64String(text);
             return encoding.GetString(textAsBytes);
