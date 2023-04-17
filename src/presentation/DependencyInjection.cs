@@ -34,11 +34,6 @@ public static class DependencyInjection
 			return Results.Created("GetTasks", new { id = 1 });
 		});
 
-		group.MapDelete("/", () =>
-		{
-			return Results.Created("GetTasks", new { id = 1 });
-		});
-
 		return app;
     }
 }

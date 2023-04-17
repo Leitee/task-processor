@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TaskProcessor.Core;
+using TaskProcessor.Core.Entities;
 
 namespace TaskProcessor.Infrastructure;
 

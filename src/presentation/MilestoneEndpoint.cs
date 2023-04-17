@@ -1,5 +1,5 @@
 ﻿using FastEndpoints;
-using TaskProcessor.Core;
+using TaskProcessor.Core.Models;
 
 namespace TaskProcessor.Presentation;
 public class MilestoneEndpoint : Endpoint<MilestoneDto>

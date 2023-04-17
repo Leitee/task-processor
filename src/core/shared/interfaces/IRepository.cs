@@ -1,15 +1,15 @@
 using System.Linq.Expressions;
 
-namespace TaskProcessor.Core
+namespace TaskProcessor.Core.Shared.Interfaces
 {
-	public interface IRepository<TEntity, TId> where TEntity : IEntity<TId> where TId : struct
-    {
-        Task<IQueryable<TEntity>> AllAsync(CancellationToken cancellationToken = default);
+	public interface IRepository<TEntity, TId> where TEntity : BaseEntity where TId : struct
+	{
+		Task<IQueryable<TEntity>> AllAsync(CancellationToken cancellationToken = default);
 		Task<TEntity> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
 		Task<TEntity> FindAsync(TId id, CancellationToken cancellationToken = default);
 		Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
 		Task UpdateAsync(TEntity entityToUpdate, CancellationToken cancellationToken = default);
 		Task DeleteAsync(TId id, CancellationToken cancellationToken = default);
 		Task DeleteAsync(TEntity entityToDelete, CancellationToken cancellationToken = default);
-    }
+	}
 }

@@ -1,4 +1,4 @@
-namespace TaskProcessor.Core.Shared;
+namespace TaskProcessor.Core.Shared.Interfaces;
 
 public interface IPayload
 {

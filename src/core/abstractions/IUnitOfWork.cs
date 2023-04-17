@@ -1,9 +1,11 @@
-namespace TaskProcessor.Core;
+using TaskProcessor.Core.Shared;
+
+namespace TaskProcessor.Core.Abstractions;
 public interface IUnitOfWork
 {
-    IEntityFrameworkRepository GetRepository<TEntity>() where TEntity : EntityBase;
+	IEntityFrameworkRepository GetRepository<TEntity>() where TEntity : BaseEntity;
 
-    bool Commit();
+	bool Commit();
 
-    Task<bool> CommitAsync(CancellationToken cancellationToken = default);
+	Task<bool> CommitAsync(CancellationToken cancellationToken = default);
 }

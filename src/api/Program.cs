@@ -26,26 +26,4 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UsePresentation();
 
-var group = app.MapGroup("task");
-
-group.MapGet("/", () =>
-{    
-    return new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };  
-})
-.WithName("GetTasks")
-.WithOpenApi();
-
-group.MapPost("/", () => 
-{
-    return Results.Created("GetTasks", new {id= 1});
-});
-
-group.MapDelete("/", () => 
-{
-    return Results.Created("GetTasks", new {id= 1});
-});
-
 app.Run();

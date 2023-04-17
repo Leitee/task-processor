@@ -1,7 +1,10 @@
-namespace TaskProcessor.Core;
+using TaskProcessor.Core.Shared;
+using TaskProcessor.Core.Shared.Interfaces;
 
-public interface IEntityFrameworkRepository : IRepository<EntityBase, 
-    Guid>, IRepositoryIncludable<EntityBase>, IRepositoryExtended<EntityBase>
+namespace TaskProcessor.Core.Abstractions;
+
+public interface IEntityFrameworkRepository : IRepository<BaseEntity,
+	Guid>, IRepositoryIncludable<BaseEntity>, IRepositoryExtended<BaseEntity>
 {
-    
+
 }

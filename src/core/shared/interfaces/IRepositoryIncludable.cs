@@ -1,7 +1,8 @@
+using TaskProcessor.Core.Shared;
 
-namespace TaskProcessor.Core;
+namespace TaskProcessor.Core.Shared.Interfaces;
 
-public interface IRepositoryIncludable<TEntity> where TEntity : EntityBase
+public interface IRepositoryIncludable<TEntity> where TEntity : BaseEntity
 {
 	Task<IQueryable<TEntity>> AllAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>,
 		IOrderedQueryable<TEntity>> orderBy, CancellationToken cancellationToken = default, params Expression<Func<IIncludable<TEntity>, IIncludable>>[] includes);

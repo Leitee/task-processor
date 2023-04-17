@@ -1,9 +1,9 @@
-using TaskProcessor.Core.Engine;
+using TaskProcessor.Core.Shared.engine;
 
-namespace TaskProcessor.Core.Shared;
+namespace TaskProcessor.Core.Shared.Interfaces;
 
 public interface IMessageBroker
 {
-    Task<TaskMessageBase<IPayload>> DequeueAsync(CancellationToken cancellationToken = default);
-    Task PublishAsync(TaskMessageBase<IPayload> taskMessage, CancellationToken cancellationToken = default);
+	Task<TaskBaseMessage<IPayload>> DequeueAsync(CancellationToken cancellationToken = default);
+	Task PublishAsync(TaskBaseMessage<IPayload> taskMessage, CancellationToken cancellationToken = default);
 }
