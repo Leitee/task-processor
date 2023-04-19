@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using TaskProcessor.Core.Shared.Interfaces;
 
 namespace TaskProcessor.Core.Shared
 {
@@ -30,7 +31,14 @@ namespace TaskProcessor.Core.Shared
 
     public static class HelpersExtensions
     {
-        public static TEnum ToEnum<TEnum>(this string value)
+		private static Encoding DEFAULT_FORMAT = Encoding.UTF8;
+        private static JsonSerializerOptions JSON_OPTIONS = new JsonSerializerOptions
+        {
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			WriteIndented = true
+		};
+
+		public static TEnum ToEnum<TEnum>(this string value)
         {
             return (TEnum)Enum.Parse(typeof(TEnum), value, true);
         }
@@ -41,22 +49,26 @@ namespace TaskProcessor.Core.Shared
             return name is null ? default : name.ToEnum<TEnum>();
         }
 
-        public static string EncodeBase64(this string text, Encoding encoding)
-        {
-            if (string.IsNullOrEmpty(text))
-                return string.Empty;
+		public static byte[] EncodeToBase64(this string text) => 
+            string.IsNullOrEmpty(text) ?
+			DEFAULT_FORMAT.GetBytes(text) : 
+            Array.Empty<byte>();
 
-            byte[] textAsBytes = encoding.GetBytes(text);
-            return Convert.ToBase64String(textAsBytes);
-        }
+        public static string DecodeBase64(this byte[] payload) =>
+            payload?.Any() is true ?
+			DEFAULT_FORMAT.GetString(payload) :
+            string.Empty;
 
-        public static string DecodeBase64(this string text, Encoding encoding)
-        {
-            if (string.IsNullOrEmpty(text))
-                return string.Empty;
+		public static string EncodeToString(this string text) => 
+            Convert.ToBase64String(EncodeToBase64(text));
 
-            byte[] textAsBytes = Convert.FromBase64String(text);
-            return encoding.GetString(textAsBytes);
-        }
-    }
+		public static string DecodeToString(this string text) => 
+            DecodeBase64(Convert.FromBase64String(text));
+
+        public static TPayload? DecodeToPayload<TPayload>(this string text) =>
+            JsonSerializer.Deserialize<TPayload>(text, JSON_OPTIONS);
+
+		public static string EncodePayload(this IPayload payload) => 
+            JsonSerializer.Serialize(payload, JSON_OPTIONS);
+	}
 }

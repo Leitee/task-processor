@@ -1,12 +1,9 @@
-using System.Text;
 using TaskProcessor.Core.Shared.Interfaces;
 
 namespace TaskProcessor.Core.Shared.engine;
 
-public class TaskBaseMessage<TPayload> : BaseMessage where TPayload : IPayload
+public sealed class TaskMessage : BaseMessage
 {
-	private static Encoding DEFAULT_FORMAT = Encoding.UTF8;
-
 	[JsonInclude]
 	public StepTask CurrentStep { get; private set; }
 
@@ -14,20 +11,23 @@ public class TaskBaseMessage<TPayload> : BaseMessage where TPayload : IPayload
 	public DateTime LastUpdate { get; private set; }
 
 	[JsonInclude]
-	public string Payload { get; private set; }
+	public bool IsDeadLetter { get; private set; }
 
-	public TaskBaseMessage(TPayload payload)
+	[JsonInclude]
+	public byte[] Payload { get; private set; }
+
+	public TaskMessage(IPayload payload)
 	{
 		ArgumentNullException.ThrowIfNull(payload);
 
 		CreationDate = DateTime.Now;
 		CurrentStep = new StepTask();
-		Payload = JsonSerializer.Serialize(payload).EncodeBase64(DEFAULT_FORMAT)!;//TODO: store base64 encoded 
+		Payload = payload.EncodePayload().EncodeToBase64();
 	}
 
-	public void MarkCurrentStepAsCompleted(bool result = true)
+	public void MarkCurrentStepAsCompleted(bool value = true)
 	{
-		if (result)
+		if (value)
 		{
 			CurrentStep.SetAsCompleted();
 			LastUpdate = DateTime.Now;
@@ -40,15 +40,21 @@ public class TaskBaseMessage<TPayload> : BaseMessage where TPayload : IPayload
 		LastUpdate = DateTime.Now;
 	}
 
-	public void MarkCurrentTaskAsInvalid(bool isTaskInvalid = true)
+	public void MarkCurrentTaskAsInvalid(bool value = true)
 	{
-		if (isTaskInvalid)
+		if (value)
 		{
 			CurrentStep.SetAsInvalid();
 			LastUpdate = DateTime.Now;
 		}
 	}
 
-	public TPayload? GetPayload()
-		=> JsonSerializer.Deserialize<TPayload>(Payload.DecodeBase64(DEFAULT_FORMAT));
+	public void MarkAsDeadLetter(bool value = true)
+	{
+		IsDeadLetter = value;
+		LastUpdate = DateTime.Now;
+	}
+
+	public TPayload? GetPayload<TPayload>() where TPayload : IPayload
+		=> Payload.DecodeBase64().DecodeToPayload<TPayload>();
 }

@@ -1,8 +1,6 @@
-using System.Linq.Expressions;
-
 namespace TaskProcessor.Core.Shared.Interfaces
 {
-	public interface IRepository<TEntity, TId> where TEntity : BaseEntity where TId : struct
+	public interface IRepository<TEntity, TId> where TId : struct
 	{
 		Task<IQueryable<TEntity>> AllAsync(CancellationToken cancellationToken = default);
 		Task<TEntity> GetByIdAsync(TId id, CancellationToken cancellationToken = default);

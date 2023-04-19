@@ -1,48 +1,35 @@
+using OneOf;
+using OneOf.Types;
 using TaskProcessor.Core.Abstractions;
-using TaskProcessor.Core.Entities;
-using TaskProcessor.Core.Models;
+using TaskProcessor.Core.IO;
 using TaskProcessor.Core.Shared.engine;
-using TaskProcessor.Core.Shared.Interfaces;
 
 namespace TaskProcessor.Core.Engine;
 
-public record TaskSchedulerResponse(string Message, bool HasError = false);
-
-public record TaskSchedulerRequest(MilestoneDto Payload) : IRequest<TaskSchedulerResponse>;
-
-public class TaskScheduler : IRequestHandler<TaskSchedulerRequest, TaskSchedulerResponse>
+public class TaskScheduler : ITaskScheduler
 {
-    private readonly IUnitOfWork _uow;
-    private readonly IMessageBroker _messageBroker;
+	private readonly IUnitOfWork _uow;
+	private readonly IPubSubHandler _messageBroker;
 
-	public TaskScheduler(IUnitOfWork unitOfWork, IMessageBroker messageBroker)
+	public TaskScheduler(IUnitOfWork unitOfWork, IPubSubHandler messageBroker)
 	{
 		_uow = unitOfWork;
 		_messageBroker = messageBroker;
 	}
 
-	public async Task<TaskSchedulerResponse> Handle(TaskSchedulerRequest request, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request.Payload?.Goals);
+	public async Task<OneOf<Success, Error<string>>> DispatchNewOperation(TaskMessage taskMessage,
+		CancellationToken cancellationToken)
+	{
+		ArgumentNullException.ThrowIfNull(taskMessage);
 
-        var goalsToSave = request.Payload.Goals
-                .Select(g => new Goal(g.Name, g.Description));
+		var newTaskMessage = await _uow.GetTasksStore()
+			.InsertAsync(taskMessage, cancellationToken);
 
+		if (!await _uow.CommitAsync(cancellationToken))
+			return new Error<string>("Error while saving the milestone");
 
-		var newMilestone = new Milestone(request.Payload.Name)
-            .SetGoals(goalsToSave);
+		await _messageBroker.PublishMessageAsync(newTaskMessage, cancellationToken);
 
-
-        var result = await _uow.GetRepository<Milestone>()
-            .InsertAsync(newMilestone, cancellationToken);
-
-        if (!await _uow.CommitAsync(cancellationToken))
-            return new TaskSchedulerResponse("Error while saving the milestone", true);
-
-		var messagePayload = new TaskBaseMessage<IPayload>(newMilestone);
-
-        await _messageBroker.PublishAsync(messagePayload, cancellationToken);
-
-        return new TaskSchedulerResponse("OK");
-    }
+		return new Success();
+	}
 }

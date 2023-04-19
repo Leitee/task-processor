@@ -3,7 +3,9 @@ using TaskProcessor.Core.Shared;
 namespace TaskProcessor.Core.Abstractions;
 public interface IUnitOfWork
 {
-	IEntityFrameworkRepository GetRepository<TEntity>() where TEntity : BaseEntity;
+	IEntitiesRepository GetRepository<TEntity>() where TEntity : BaseEntity;
+
+	ITasksStore GetTasksStore();
 
 	bool Commit();
 
