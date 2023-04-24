@@ -1,7 +1,7 @@
-﻿using TaskProcessor.Core.Engine;
-using TaskProcessor.Core.Shared.engine;
+﻿using TaskProcessor.Shared.Engine;
+using TaskProcessor.Shared.Interfaces;
 
-namespace TaskProcessor.Core.CQRS;
+namespace TaskProcessor.CQRS;
 
 public record ProcessTaskMessageCommand(TaskMessage TaskMessage) : IRequest
 {

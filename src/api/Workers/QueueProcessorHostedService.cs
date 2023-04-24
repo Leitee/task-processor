@@ -1,7 +1,7 @@
 using MediatR;
-using TaskProcessor.Core.CQRS;
 using TaskProcessor.Core.IO;
-using TaskProcessor.Core.Shared.engine;
+using TaskProcessor.CQRS;
+using TaskProcessor.Shared.Engine;
 
 namespace VisionBox.DataSynchronizer.GATEUYSISCAP2.Api.Workers;
 

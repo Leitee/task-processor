@@ -1,4 +1,6 @@
-namespace TaskProcessor.Core.Shared.Interfaces;
+using TaskProcessor.Shared;
+
+namespace TaskProcessor.Core.IO;
 
 public interface IRepositoryExtended<TEntity> where TEntity : BaseEntity
 {

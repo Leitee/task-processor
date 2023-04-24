@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TaskProcessor.Core.Shared;
+namespace TaskProcessor.Shared;
 public abstract class BaseEntity
 {
 	public Guid Id { get; set; }

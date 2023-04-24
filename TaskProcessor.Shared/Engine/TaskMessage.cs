@@ -1,6 +1,7 @@
-using TaskProcessor.Core.Shared.Interfaces;
+using System.Text.Json.Serialization;
+using TaskProcessor.Shared.Interfaces;
 
-namespace TaskProcessor.Core.Shared.engine;
+namespace TaskProcessor.Shared.Engine;
 
 public sealed class TaskMessage : BaseMessage
 {

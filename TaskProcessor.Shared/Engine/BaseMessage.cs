@@ -1,4 +1,6 @@
-namespace TaskProcessor.Core.Shared.engine;
+using System.Text.Json.Serialization;
+
+namespace TaskProcessor.Shared.Engine;
 
 public abstract class BaseMessage
 {

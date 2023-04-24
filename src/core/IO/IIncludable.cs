@@ -1,4 +1,4 @@
-namespace TaskProcessor.Core.Shared.Interfaces;
+namespace TaskProcessor.Core.IO;
 
 public interface IIncludable { }
 

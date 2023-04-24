@@ -1,4 +1,4 @@
-using TaskProcessor.Core.Shared;
+using TaskProcessor.Shared;
 
 namespace TaskProcessor.Core.Entities;
 public class Goal : BaseEntity

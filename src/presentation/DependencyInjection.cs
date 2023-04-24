@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace TaskProcessor.Presentation;
 public static class DependencyInjection
 {
@@ -15,8 +14,6 @@ public static class DependencyInjection
 
 	public static IApplicationBuilder UsePresentation(this IApplicationBuilder app)
     {
-
-
 		var group = ((WebApplication)app).MapGroup("task");
 
 		group.MapGet("/", () =>

@@ -1,5 +1,5 @@
-using TaskProcessor.Core.Shared;
-using TaskProcessor.Core.Shared.Interfaces;
+using TaskProcessor.Shared;
+using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Core.Entities;
 public class Milestone : BaseEntity, IPayload

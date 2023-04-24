@@ -1,9 +1,8 @@
-using TaskProcessor.Core.Shared;
-using TaskProcessor.Core.Shared.Interfaces;
+using TaskProcessor.Shared;
 
-namespace TaskProcessor.Core.Abstractions;
+namespace TaskProcessor.Core.IO;
 
-public interface IEntitiesRepository : IRepository<BaseEntity,	Guid>, 
+public interface IEntitiesRepository : IRepository<BaseEntity, Guid>,
 	IRepositoryIncludable<BaseEntity>, IRepositoryExtended<BaseEntity>
 {
 

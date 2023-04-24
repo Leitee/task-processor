@@ -1,5 +1,5 @@
 using TaskProcessor.Core.IO;
-using TaskProcessor.Core.Shared;
+using TaskProcessor.Shared;
 
 namespace TaskProcessor.Core.Abstractions;
 public interface IUnitOfWork

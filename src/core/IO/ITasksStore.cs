@@ -1,5 +1,4 @@
-using TaskProcessor.Core.Shared.engine;
-using TaskProcessor.Core.Shared.Interfaces;
+using TaskProcessor.Shared.Engine;
 
 namespace TaskProcessor.Core.IO;
 

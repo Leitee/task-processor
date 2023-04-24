@@ -1,10 +1,10 @@
-﻿using TaskProcessor.Core.Shared.engine;
+﻿using TaskProcessor.Shared.Engine;
+using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Core.IO
 {
-	public interface IPubSubHandler
+	public interface IPubSubHandler : ITaskPublisher
 	{
 		Task<TaskMessage> ConsumeMessageAsync(CancellationToken cancellationToken);
-		Task PublishMessageAsync(TaskMessage message, CancellationToken cancellationToken);
 	}
 }
