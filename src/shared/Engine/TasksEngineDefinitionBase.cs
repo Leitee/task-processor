@@ -3,36 +3,35 @@
 namespace TaskProcessor.Shared.Engine;
 
 #nullable disable
-public abstract class TasksEngineDefinition : ITaskEngineDefinition
+public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 {
-	protected readonly LinkedList<IExecutableStep> _taskSteps;
+	private readonly LinkedList<IExecutableStep> _taskSteps;
 
 	public IReadOnlyCollection<IExecutableStep> TaskList => _taskSteps.ToList().AsReadOnly();
 
-	public TasksEngineDefinition()
+	public TasksEngineDefinitionBase()
 	{
-		if (_taskSteps?.Any() is true) return;
-
-		var stepList = BuildDefinition();
-		_taskSteps = stepList?.Any() is true
-			? new LinkedList<IExecutableStep>(stepList.OrderBy(ex => ex.ExecutionOrder))
+		var tempList = BuildDefinition();
+		_taskSteps = tempList?.Any() is true
+			? new LinkedList<IExecutableStep>(tempList.OrderBy(ex => ex.ExecutionOrder))
 			: throw new ExecutableStepsNotFoundException();
 	}
 
-	protected abstract IEnumerable<IExecutableStep> BuildDefinition();
+	public abstract IEnumerable<IExecutableStep> BuildDefinition();
 
 	public virtual bool TryGetNextStepTask(StepTask step, out IExecutableStep nextStepTask)
 	{
-		IExecutableStep currentTask = null;
+		IExecutableStep currentTask = null;		
 
-		if (!string.IsNullOrEmpty(step.Name)
-			&& !TryGetExecutableStepByName(step.Name, out currentTask))
-			throw new ExecutableStepsNotFoundException();
-
-		if (string.IsNullOrEmpty(step.Name) || currentTask is null)
+		if (step.Name is StepTask.INITIAL_STEP_NAME)
 		{
 			nextStepTask = _taskSteps.First.Value;
 			step.SetNextTask(nextStepTask.Name);
+		}
+		else if (!string.IsNullOrEmpty(step.Name)
+			&& !TryGetExecutableStepByName(step.Name, out currentTask))
+		{
+			throw new ExecutableStepsNotFoundException();
 		}
 		else if (currentTask?.IsLastStep is true)
 		{
@@ -68,6 +67,6 @@ public abstract class TasksEngineDefinition : ITaskEngineDefinition
 	protected virtual bool TryGetExecutableStepByName(string name, out IExecutableStep executableStep)
 	{
 		executableStep = _taskSteps.FirstOrDefault(t => t.Name == name);
-		return executableStep != null;
+		return executableStep is not null;
 	}
 }
