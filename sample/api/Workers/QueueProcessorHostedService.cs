@@ -1,5 +1,5 @@
 using MediatR;
-using TaskProcessor.CQRS;
+using TaskProcessor.Domain.CQRS;
 using TaskProcessor.Domain.IO;
 using TaskProcessor.Shared.Engine;
 

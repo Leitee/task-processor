@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TaskProcessor.Shared\TaskProcessor.Shared.csproj" />
+    <ProjectReference Include="..\shared\TaskProcessor.Shared.csproj" />
   </ItemGroup>
 
 </Project>
