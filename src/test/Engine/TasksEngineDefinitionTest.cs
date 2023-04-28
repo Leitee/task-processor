@@ -67,14 +67,16 @@ public class DataSynchronizerTasksEngineDefinitionTest
 	{
 		IExecutableStep[] result = new IExecutableStep[qty];
 
-		for (int i = 0; i < qty; i++)
+		for (int index = 0; index < qty; index++)
 		{
-			byte order = (byte)(i + 1);
+			byte order = (byte)(index + 1);
 			var task = new Mock<IExecutableStep>();
 			task.SetupGet(x => x.ExecutionOrder).Returns(order);
 			task.SetupGet(x => x.Name).Returns($"Task{order}");
+			task.SetupGet(x => x.MaxRetires).Returns(2);
+			task.SetupGet(x => x.IsLastStep).Returns(index == (qty - 1));
 
-			result[i] = task.Object;
+			result[index] = task.Object;
 		}
 
 		return result;
@@ -101,73 +103,101 @@ public class DataSynchronizerTasksEngineDefinitionTest
 
 		currentStep.Should().NotBe(controlInstance);
 	}
-	/*
+
 	[Fact]
 	public void Should_ReturnNextTask_When_StepIsCompleted()
 	{
+		_mock
+			.Setup(x => x.BuildDefinition())
+			.Returns(CreateExecutableTasks(5))
+			.Verifiable();
+
+		var sut = _mock.Object;
+
 		var currentStep = new StepTask();
-		currentStep.SetNextTask(nameof(RetrievePassengerDetailsTask));
+		currentStep.SetNextTask("Task1");
 		currentStep.SetAsCompleted();
 
-		var desiredStep = new StepTask();
-		desiredStep.SetNextTask(nameof(SaveBiographicDataTask));
-
-		var isNextTask = _mock.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+		var controlInstance = currentStep.Clone();
+		controlInstance.SetNextTask("Task2");
+		
+		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
 		isNextTask.Should().BeTrue();
 
-		nextStepTask.Should().BeOfType<SaveBiographicDataTask>();
+		currentStep.Should().BeEquivalentTo(controlInstance);
 
-		currentStep.Should().BeEquivalentTo(currentStep);
+		nextStepTask.Name.Should().Be("Task2");
 	}
+
 
 	[Fact]
 	public void Should_ReturnSameTask_When_NotMaxFailAttemptsReached()
 	{
+		_mock
+			.Setup(x => x.BuildDefinition())
+			.Returns(CreateExecutableTasks(5))
+			.Verifiable();
+
+		var sut = _mock.Object;
+
 		var currentStep = new StepTask();
-		currentStep.SetNextTask(nameof(RetrievePassengerDetailsTask));
+		currentStep.SetNextTask("Task1"); 
 		currentStep.SetAsFailure("Error 1");
 
-		var desiredStep = currentStep.Clone();
+		var controlInstance = currentStep.Clone();
 
-		var isNextTask = _mock.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
-		isNextTask.Should().BeTrue();
+		isNextTask.Should().BeFalse();
 
-		nextStepTask.Should().BeOfType<RetrievePassengerDetailsTask>();
+		nextStepTask.Name.Should().Be("Task1");
 
-		currentStep.Should().BeEquivalentTo(desiredStep);
+		currentStep.Should().BeEquivalentTo(controlInstance);
 	}
 
 	[Fact]
 	public void Should_ReturnFailureTask_When_MaxFailAttemptsReached()
 	{
+		_mock
+			.Setup(x => x.BuildDefinition())
+			.Returns(CreateExecutableTasks(5))
+			.Verifiable();
+
+		var sut = _mock.Object;
+
 		var currentStep = new StepTask();
-		currentStep.SetNextTask(nameof(RetrievePassengerDetailsTask));
+		currentStep.SetNextTask("Task1");
 		currentStep.SetAsFailure("Error 1");
 		currentStep.SetAsFailure("Error 2");
 
 		var desiredStep = currentStep.Clone();
 
-		var isNextTask = _mock.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
 		isNextTask.Should().BeTrue();
 
-		nextStepTask.Should().BeOfType<HandleFailureTask>();
+		nextStepTask.Name.Should().Be("Task5");
 
 		currentStep.Should().BeEquivalentTo(desiredStep);
 	}
 
-
 	[Fact]
-	public void Should_ReturnNoTask_When_MaxTaskIsLastOne()
+	public void Should_ReturnNoTask_When_NextTaskIsLastOne()
 	{
+		_mock
+			.Setup(x => x.BuildDefinition())
+			.Returns(CreateExecutableTasks(5))
+			.Verifiable();
+
+		var sut = _mock.Object;
+
 		var currentStep = new StepTask();
-		currentStep.SetNextTask(nameof(FinalizeSuccessEnrollFlowTask));
+		currentStep.SetNextTask("Task5");
 
 		var desiredStep = currentStep.Clone();
 
-		var isNextTask = _mock.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
 		isNextTask.Should().BeFalse();
 
@@ -175,16 +205,21 @@ public class DataSynchronizerTasksEngineDefinitionTest
 	}
 
 	[Fact]
-	public void Should_TrhowExecutableStepsNotPresentException_When_TaskNotFoundWithValidTaskName()
+	public void Should_TrhowExecutableStepsNotFoundException_When_TaskNotFoundWithValidTaskName()
 	{
+		_mock
+			.Setup(x => x.BuildDefinition())
+			.Returns(CreateExecutableTasks(5))
+			.Verifiable();
+
+		var sut = _mock.Object;
 		var currentStep = new StepTask();
-		currentStep.SetNextTask("NotExistenTask");
+		currentStep.SetNextTask("NotExistentTask");
 
 		var desiredStep = currentStep.Clone();
 
-		Func<bool> act = () => _mock.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+		Func<bool> act = () => sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
 		act.Should().ThrowExactly<ExecutableStepsNotFoundException>();
 	}
-	*/
 }

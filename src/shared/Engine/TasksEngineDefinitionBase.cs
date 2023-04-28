@@ -50,6 +50,7 @@ public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 		else
 		{
 			nextStepTask = currentTask;
+			return false;
 		}
 
 		return true;
