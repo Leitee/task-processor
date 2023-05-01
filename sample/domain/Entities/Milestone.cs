@@ -1,4 +1,3 @@
-using TaskProcessor.Shared;
 using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Domain.Entities;

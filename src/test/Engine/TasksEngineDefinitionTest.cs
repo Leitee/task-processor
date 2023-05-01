@@ -11,55 +11,6 @@ public class DataSynchronizerTasksEngineDefinitionTest
 
 	public DataSynchronizerTasksEngineDefinitionTest()
 	{
-		/*
-		var ctxRepo = new Mock<IContextDataRepository>();
-		ctxRepo
-			.Setup(x => x.Create(It.IsAny<Passenger>(), CancellationToken.None))
-			.Returns(Task.CompletedTask);
-
-		var uow = new Mock<IUnitOfWork>();
-		uow
-			.Setup(x => x.CommitAsync(CancellationToken.None))
-			.Returns(Task.FromResult(true));
-
-		var extClient = new Mock<IEasyAirportClient>();
-		extClient
-			.Setup(x => x.GetPassengerDetailsAsync(It.IsAny<string>(), CancellationToken.None))
-			.Returns(Task.FromResult(It.IsAny<Passenger>()));
-
-		var orchClient = new Mock<IOrchestraApiFacade>();
-		orchClient
-			.Setup(x => x.CreateBiographicAsync(It.IsAny<Passenger>(), CancellationToken.None))
-			.Returns(Task.FromResult(It.IsAny<string>()));
-
-
-		var servicesCollection = new ServiceCollection();
-		servicesCollection.AddSingleton<ILoggerFactory, NullLoggerFactory>();
-		servicesCollection.AddScoped(sp => ctxRepo.Object);
-		servicesCollection.AddSingleton(sp => uow.Object);
-		servicesCollection.AddSingleton(sp => extClient.Object);
-		servicesCollection.AddSingleton(sp => orchClient.Object);
-		servicesCollection.AddSingleton<IExecutableStep, HandleFailureTask>();
-		servicesCollection.AddScoped<IExecutableStep, RetrievePassengerDetailsTask>();
-		servicesCollection.AddScoped<IExecutableStep, SaveBiographicDataTask>();
-		servicesCollection.AddScoped<IExecutableStep, FinalizeSuccessEnrollFlowTask>();
-
-
-		var serviceProvider = new Mock<IServiceProvider>();
-		serviceProvider
-			.Setup(x => x.GetService(typeof(IEnumerable<IExecutableStep>)))
-			.Returns(servicesCollection);
-
-		var serviceScope = new Mock<IServiceScope>();
-		serviceScope.Setup(x => x.ServiceProvider)
-			.Returns(servicesCollection.BuildServiceProvider());
-
-		var serviceScopeFactory = new Mock<IServiceScopeFactory>();
-		serviceScopeFactory
-			.Setup(x => x.CreateScope())
-			.Returns(serviceScope.Object);
-		*/
-
 		_mock =  new Mock<TasksEngineDefinitionBase> { CallBase = true };
 	}
 

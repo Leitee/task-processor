@@ -4,6 +4,5 @@ namespace TaskProcessor.Shared.Interfaces;
 
 public interface ITaskDispatcher
 {
-	Task<TaskResult> DispatchNextOperation(TaskMessage taskMessage, IExecutableStep executableStep,
-		CancellationToken cancellationToken);
+	Task<TaskResult> DispatchNewOperation(TaskMessage taskMessage, CancellationToken cancellationToken);
 }

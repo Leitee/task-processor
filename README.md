@@ -1,2 +1,2 @@
-# task-processor
-Parallel task processor
+# Task Processor POC
+Scalable task processor for sequencial long running operations. 

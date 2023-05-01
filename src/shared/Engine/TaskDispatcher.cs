@@ -1,48 +1,28 @@
-﻿using Microsoft.Extensions.Logging;
 using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Shared.Engine;
 
 public class TaskDispatcher : ITaskDispatcher
 {
-	private readonly ITaskPublisher _publisher;
-	private readonly ILogger _logger;
+	private readonly ITaskPersistence _taskPersistence;
+	private readonly ITaskPublisher _messageBroker;
 
-	public TaskDispatcher(ITaskPublisher publisher, ILoggerFactory loggerFactory)
+	public TaskDispatcher(ITaskPersistence taskPersistence, ITaskPublisher messageBroker)
 	{
-		_publisher = publisher;
-		_logger = loggerFactory.CreateLogger<TaskDispatcher>();
+		_taskPersistence = taskPersistence;
+		_messageBroker = messageBroker;
 	}
 
-	public async Task<TaskResult> DispatchNextOperation(TaskMessage taskMessage,
-		IExecutableStep executableStep, CancellationToken cancellationToken)
+	public async Task<TaskResult> DispatchNewOperation(TaskMessage taskMessage,
+		CancellationToken cancellationToken)
 	{
-		if (taskMessage is null || executableStep is null)
-		{
-			_logger.LogError("Some parameter are null [{@msg}] and [{@exe}]", taskMessage, executableStep);
-			return TaskResult.Error;
-		}
+		ArgumentNullException.ThrowIfNull(taskMessage);
 
-		_logger.LogDebug("Executing task [{taskNamee}] with the following message {@msg}",
-			executableStep.Name, taskMessage);
+		var persistenceResult = await _taskPersistence.SaveMessageAsync(taskMessage, cancellationToken);
 
-		var taskCancellatiomToken = new CancellationTokenSource(executableStep.Timeout).Token;
-		var result = await executableStep.ExecuteAsync(taskMessage, taskCancellatiomToken);
+		if (persistenceResult.TryPickT0(out var storedTaskMessage, out var errorWhenSaving))
+			return await _messageBroker.PublishMessageAsync(storedTaskMessage, cancellationToken);
 
-		_logger.LogInformation(result.ToString());
-
-		result.Switch(
-			ok => taskMessage.MarkCurrentStepAsCompleted(),
-			error => taskMessage.SetErrorAtCurrentStep(error.Value)
-			);
-
-		if (!executableStep.IsLastStep)
-		{
-			_logger.LogInformation("Publishing - [{taskName}] as is not the last one for flow [{flow}]",
-				executableStep.Name, "Default");// executableStep.WorkFlow.ToString());
-			return await _publisher.PublishMessageAsync(taskMessage, cancellationToken);
-		}
-
-		return TaskResult.Success;
+		return errorWhenSaving;
 	}
 }

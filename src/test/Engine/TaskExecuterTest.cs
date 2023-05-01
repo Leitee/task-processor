@@ -6,19 +6,19 @@ using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Shared.Tests.Engine
 {
-	public class TaskDispatcherTest
+	public class TaskExecuterTest
     {
-        private readonly ITaskDispatcher _sut;
+        private readonly ITaskExecuter _sut;
         private readonly Mock<ITaskPublisher> _publisher = new Mock<ITaskPublisher>();
 
-        public TaskDispatcherTest()
+        public TaskExecuterTest()
         {
 			_publisher
 				.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
 				.ReturnsAsync(TaskResult.Success)
 				.Verifiable();
 
-			_sut = new TaskDispatcher(_publisher.Object, NullLoggerFactory.Instance);
+			_sut = new TaskExecuter(_publisher.Object, NullLoggerFactory.Instance);
         }
 
 		[Theory ]
@@ -31,7 +31,7 @@ namespace TaskProcessor.Shared.Tests.Engine
 			TaskMessage taskMessage = param1 ? new Mock<TaskMessage>(payload.Object).Object : null;
 			IExecutableStep execTask = param2 ? new Mock<IExecutableStep>().Object : null;
 
-			var act = () => _sut.DispatchNextOperation(taskMessage, execTask, CancellationToken.None);
+			var act = () => _sut.ExecuteNextOperation(taskMessage, execTask, CancellationToken.None);
 
 			await act.Should().NotThrowAsync();
 
@@ -54,7 +54,7 @@ namespace TaskProcessor.Shared.Tests.Engine
                 .ReturnsAsync(TaskResult.Success)
                 .Verifiable();
 
-            var result = _sut.DispatchNextOperation(taskMessage.Object, execTask.Object, It.IsAny<CancellationToken>())
+            var result = _sut.ExecuteNextOperation(taskMessage.Object, execTask.Object, It.IsAny<CancellationToken>())
 				.Result;
 
             result.Should().BeSuccess();
@@ -77,7 +77,7 @@ namespace TaskProcessor.Shared.Tests.Engine
 				.ReturnsAsync(TaskResult.Success)
 				.Verifiable();
 
-			var result = _sut.DispatchNextOperation(taskMessage.Object, execTask.Object, It.IsAny<CancellationToken>())
+			var result = _sut.ExecuteNextOperation(taskMessage.Object, execTask.Object, It.IsAny<CancellationToken>())
 				.Result;
 
 			result.Should().BeSuccess();

@@ -1,4 +1,4 @@
-using TaskProcessor.Shared;
+using TaskProcessor.Domain.Entities;
 
 namespace TaskProcessor.Domain.IO;
 

@@ -9,7 +9,7 @@ using TaskProcessor.Shared.Engine;
 public interface IExecutableStep
 {
 	string Name { get; }
-	//WorkflowType WorkFlow { get; }
+	string OperationName { get; }
 	byte ExecutionOrder { get; }
 	byte MaxRetires { get; }
 	bool IsLastStep { get; }

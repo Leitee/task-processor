@@ -12,18 +12,26 @@ public class TaskMessage : BaseMessage
 	public DateTime LastUpdate { get; private set; }
 
 	[JsonInclude]
-	public bool IsDeadLetter { get; private set; }
+	public MessageStatus Status { get; private set; }
 
 	[JsonInclude]
-	public byte[] Payload { get; private set; }
+	public string OperationName { get; private set; }
 
-	public TaskMessage(IPayload payload)
+	[JsonInclude]
+	public byte[]? Payload { get; private set; }
+
+	public TaskMessage(string operationName, IPayload payload)
 	{
-		ArgumentNullException.ThrowIfNull(payload);
+		if (string.IsNullOrWhiteSpace(operationName))
+			throw new ArgumentException(nameof(operationName));
 
+		if(payload is not null)
+			Payload = payload.EncodePayload().EncodeToBase64();
+
+		OperationName = operationName;
 		CreationDate = DateTime.Now;
 		CurrentStep = new StepTask();
-		Payload = payload.EncodePayload().EncodeToBase64();
+		Status = MessageStatus.PROCESSING;
 	}
 
 	public void MarkCurrentStepAsCompleted(bool value = true)
@@ -50,12 +58,23 @@ public class TaskMessage : BaseMessage
 		}
 	}
 
-	public void MarkAsDeadLetter(bool value = true)
+	public void MarkAsDeadLetter()
 	{
-		IsDeadLetter = value;
+		Status = MessageStatus.IS_DEADLETTER;
 		LastUpdate = DateTime.Now;
 	}
 
 	public TPayload? GetPayload<TPayload>() where TPayload : IPayload
-		=> Payload.DecodeBase64().DecodeToPayload<TPayload>();
+		=> Payload is not null
+		? Payload.DecodeBase64().DecodeToPayload<TPayload>()
+		: default;
+}
+
+public enum MessageStatus
+{
+	CREATED,
+	PROCESSING = 1,
+	FINISHED,
+	FAILED,
+	IS_DEADLETTER
 }

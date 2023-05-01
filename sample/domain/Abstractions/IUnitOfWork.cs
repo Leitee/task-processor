@@ -1,5 +1,5 @@
+using TaskProcessor.Domain.Entities;
 using TaskProcessor.Domain.IO;
-using TaskProcessor.Shared;
 
 namespace TaskProcessor.Domain.Abstractions;
 public interface IUnitOfWork

@@ -3,24 +3,24 @@ using TaskProcessor.Domain.CQRS;
 using TaskProcessor.Domain.IO;
 using TaskProcessor.Shared.Engine;
 
-namespace VisionBox.DataSynchronizer.GATEUYSISCAP2.Api.Workers;
+namespace VisionBox.DataSynchronizer.GATEUYSISCAP2.Api.Jobs;
 
-public sealed class QueueProcessorHostedService : BackgroundService
+public sealed class TaskConsumerHostedService : BackgroundService
 {
 	private readonly ILogger _logger;
 	private readonly ISender _sender;
 	private readonly IPubSubHandler _subHandler;
 
-	public QueueProcessorHostedService(ILoggerFactory loggerFactory, ISender sender, IPubSubHandler subHandler)
+	public TaskConsumerHostedService(ILoggerFactory loggerFactory, ISender sender, IPubSubHandler subHandler)
 	{
-		_logger = loggerFactory.CreateLogger<QueueProcessorHostedService>();
+		_logger = loggerFactory.CreateLogger<TaskConsumerHostedService>();
 		_sender = sender;
 		_subHandler = subHandler;
 	}
 
 	protected override Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		_logger.LogInformation($"{nameof(QueueProcessorHostedService)} is running");
+		_logger.LogInformation($"{nameof(TaskConsumerHostedService)} is running");
 		return ProcessTaskQueueAsync(stoppingToken);
 	}
 
@@ -54,7 +54,7 @@ public sealed class QueueProcessorHostedService : BackgroundService
 
 	public override async Task StopAsync(CancellationToken stoppingToken)
 	{
-		_logger.LogInformation($"{nameof(QueueProcessorHostedService)} is stopping.");
+		_logger.LogInformation($"{nameof(TaskConsumerHostedService)} is stopping.");
 		await base.StopAsync(stoppingToken);
 	}
 }

@@ -1,5 +1,3 @@
-using TaskProcessor.Shared;
-
 namespace TaskProcessor.Domain.Entities;
 public class Goal : BaseEntity
 {
@@ -8,11 +6,12 @@ public class Goal : BaseEntity
 	public bool Completed { get; private set; }
 	public DateTimeOffset Duration { get; private set; }
 
-	public Goal(string title, string description, bool completed = false)
+	public Goal(string title, string description, DateTimeOffset duration, bool completed = false)
 	{
 		Name = title;
 		Description = description;
 		Completed = completed;
+		Duration = duration;
 	}
 
 	public void MarkAsCompleted(bool completed = true) => Completed = completed;

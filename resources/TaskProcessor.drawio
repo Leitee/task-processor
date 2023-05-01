@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-04-18T12:25:26.441Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.1.2 Chrome/106.0.5249.199 Electron/21.4.3 Safari/537.36" etag="bNi7kDDeE3ENy03Qnnio" version="21.1.2" type="device" pages="2">
+<mxfile host="Electron" modified="2023-05-01T02:13:21.591Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.1 Chrome/112.0.5615.87 Electron/24.1.2 Safari/537.36" etag="hcnHlTr_Y7j_m_jEJ1Zl" version="21.2.1" type="device" pages="2">
   <diagram id="IKzNyZ5HKRme_kFSyMwN" name="Arch overview">
-    <mxGraphModel dx="1050" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1036" dy="664" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -43,7 +43,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="7R2AokxFrsVpJuRbl_Gq-12" value="Task Scheduler" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+        <mxCell id="7R2AokxFrsVpJuRbl_Gq-12" value="Task Dispatcher" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
           <mxGeometry x="300" y="196" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="7R2AokxFrsVpJuRbl_Gq-13" value="CQRS Command" style="endArrow=classic;startArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startFill=0;" parent="1" source="7R2AokxFrsVpJuRbl_Gq-2" target="7R2AokxFrsVpJuRbl_Gq-12" edge="1">
@@ -102,7 +102,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="7R2AokxFrsVpJuRbl_Gq-25" value="Task Dispatcher" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+        <mxCell id="7R2AokxFrsVpJuRbl_Gq-25" value="Task Executer" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
           <mxGeometry x="665" y="556" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="7R2AokxFrsVpJuRbl_Gq-33" value="INJECT NEXT TASK (scoped)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontColor=default;fillColor=default;strokeColor=default;gradientColor=none;fontSize=12;" parent="1" source="7R2AokxFrsVpJuRbl_Gq-27" edge="1">

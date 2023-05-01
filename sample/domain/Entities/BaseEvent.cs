@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace TaskProcessor.Shared;
+namespace TaskProcessor.Domain.Entities;
 public abstract class BaseEvent : INotification
 {
 	public DateTime DateOccurred { get; protected set; } = DateTime.UtcNow;

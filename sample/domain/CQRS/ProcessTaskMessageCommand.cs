@@ -11,9 +11,9 @@ public record ProcessTaskMessageCommand(TaskMessage TaskMessage) : IRequest
 internal class ProcessTaskMessageCommandHanlder : IRequestHandler<ProcessTaskMessageCommand>
 {
 	private readonly ILogger _logger;
-	private readonly ITaskDispatcher _taskDispatcher;
+	private readonly ITaskExecuter _taskDispatcher;
 
-	public ProcessTaskMessageCommandHanlder(ILoggerFactory loggerFactory, ITaskDispatcher taskDispatcher)
+	public ProcessTaskMessageCommandHanlder(ILoggerFactory loggerFactory, ITaskExecuter taskDispatcher)
 	{
 		_logger = loggerFactory.CreateLogger<ProcessTaskMessageCommandHanlder>();
 		_taskDispatcher = taskDispatcher;
@@ -26,6 +26,6 @@ internal class ProcessTaskMessageCommandHanlder : IRequestHandler<ProcessTaskMes
 		ArgumentNullException.ThrowIfNull(taskMessage);
 		ArgumentNullException.ThrowIfNull(executableStep);
 
-		await _taskDispatcher.DispatchNextOperation(taskMessage, executableStep, cancellationToken);
+		await _taskDispatcher.ExecuteNextOperation(taskMessage, executableStep, cancellationToken);
 	}
 }

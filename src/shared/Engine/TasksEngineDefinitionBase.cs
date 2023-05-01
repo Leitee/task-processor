@@ -7,7 +7,7 @@ public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 {
 	private readonly LinkedList<IExecutableStep> _taskSteps;
 
-	public IReadOnlyCollection<IExecutableStep> TaskList => _taskSteps.ToList().AsReadOnly();
+    public IReadOnlyCollection<IExecutableStep> TaskList => _taskSteps.ToList().AsReadOnly();
 
 	public TasksEngineDefinitionBase()
 	{
@@ -21,7 +21,7 @@ public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 
 	public virtual bool TryGetNextStepTask(StepTask step, out IExecutableStep nextStepTask)
 	{
-		IExecutableStep currentTask = null;		
+		IExecutableStep currentTask = null;
 
 		if (step.Name is StepTask.INITIAL_STEP_NAME)
 		{
@@ -56,13 +56,13 @@ public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 		return true;
 	}
 
-	protected virtual IExecutableStep GetFailureHandlerExecutableStep() 
+	protected virtual IExecutableStep GetFailureHandlerExecutableStep()
 		=> _taskSteps.Last.Value;
 
-	protected virtual IExecutableStep GetNextTaskExecutableStep(IExecutableStep executableStep) 
+	protected virtual IExecutableStep GetNextTaskExecutableStep(IExecutableStep executableStep)
 		=> _taskSteps.Find(executableStep)?.Next?.Value;
 
-	protected virtual bool IsFinalStep(StepTask step) 
+	protected virtual bool IsFinalStep(StepTask step)
 		=> _taskSteps.Last.ValueRef.Equals(step.Name);
 
 	protected virtual bool TryGetExecutableStepByName(string name, out IExecutableStep executableStep)
