@@ -94,7 +94,7 @@ public class DataSynchronizerTasksEngineDefinitionTest
 
 		var currentStep = new StepTask();
 		currentStep.SetNextTask("Task1"); 
-		currentStep.SetAsFailure("Error 1");
+		currentStep.SetFailure("Error 1");
 
 		var controlInstance = currentStep.Clone();
 
@@ -119,8 +119,8 @@ public class DataSynchronizerTasksEngineDefinitionTest
 
 		var currentStep = new StepTask();
 		currentStep.SetNextTask("Task1");
-		currentStep.SetAsFailure("Error 1");
-		currentStep.SetAsFailure("Error 2");
+		currentStep.SetFailure("Error 1");
+		currentStep.SetFailure("Error 2");
 
 		var desiredStep = currentStep.Clone();
 

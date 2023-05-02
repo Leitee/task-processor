@@ -28,7 +28,7 @@ namespace TaskProcessor.Shared.Tests.Engine
 		public async void Should_ReturnError_WhenAnyParamsIsNull(bool param1, bool param2)
 		{
 			var payload = new Mock<IPayload>();
-			TaskMessage taskMessage = param1 ? new Mock<TaskMessage>(payload.Object).Object : null;
+			TaskMessage taskMessage = param1 ? new Mock<TaskMessage>("Operation1").Object : null;
 			IExecutableStep execTask = param2 ? new Mock<IExecutableStep>().Object : null;
 
 			var act = () => _sut.ExecuteNextOperation(taskMessage, execTask, CancellationToken.None);
@@ -46,7 +46,7 @@ namespace TaskProcessor.Shared.Tests.Engine
         public void Should_InvokePublisherOnce_WhenTaskIsNotFinal()
         {
             var payload = new Mock<IPayload>();
-            var taskMessage = new Mock<TaskMessage>(payload.Object);
+            var taskMessage = new Mock<TaskMessage>("Operation1");
 
             var execTask = new Mock<IExecutableStep>();
             execTask
@@ -66,7 +66,7 @@ namespace TaskProcessor.Shared.Tests.Engine
 		public void ShouldNever_InvokePublisher_WhenTaskIsFinal()
 		{
 			var payload = new Mock<IPayload>();
-			var taskMessage = new Mock<TaskMessage>(payload.Object);
+			var taskMessage = new Mock<TaskMessage>("Operation1");
 
 			var execTask = new Mock<IExecutableStep>();
 			execTask

@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Shared\**" />
+    <Compile Remove="ValueObjects\**" />
+    <EmbeddedResource Remove="Shared\**" />
+    <EmbeddedResource Remove="ValueObjects\**" />
+    <None Remove="Shared\**" />
+    <None Remove="ValueObjects\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Models\PayloadDto.cs" />
   </ItemGroup>
 
@@ -14,11 +23,6 @@
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="OneOf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Shared\" />
-    <Folder Include="ValueObjects\" />
   </ItemGroup>
 
   <ItemGroup>

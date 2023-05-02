@@ -21,7 +21,7 @@ public sealed class StepTask : ValueObject
 
 	public void SetAsCompleted() => IsCompleted = true;
 
-	public void SetAsFailure(string errorMsg)
+	public void SetFailure(string errorMsg)
 	{
 		FailedAttempts++;
 		ErrorMessage = errorMsg;

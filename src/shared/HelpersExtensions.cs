@@ -51,7 +51,7 @@ namespace TaskProcessor.Shared
 		}
 
 		public static byte[] EncodeToBase64(this string text) =>
-			string.IsNullOrEmpty(text) ?
+			!string.IsNullOrEmpty(text) ?
 			DEFAULT_FORMAT.GetBytes(text) :
 			Array.Empty<byte>();
 
@@ -69,7 +69,7 @@ namespace TaskProcessor.Shared
 		public static TPayload? DecodeToPayload<TPayload>(this string text) =>
 			JsonSerializer.Deserialize<TPayload>(text, JSON_OPTIONS);
 
-		public static string EncodePayload(this IPayload payload) =>
+		public static string EncodePayload<TPayload>(this TPayload payload) =>
 			JsonSerializer.Serialize(payload, JSON_OPTIONS);
 	}
 }

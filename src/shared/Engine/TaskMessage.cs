@@ -20,13 +20,10 @@ public class TaskMessage : BaseMessage
 	[JsonInclude]
 	public byte[]? Payload { get; private set; }
 
-	public TaskMessage(string operationName, IPayload payload)
+	public TaskMessage(string operationName)
 	{
 		if (string.IsNullOrWhiteSpace(operationName))
 			throw new ArgumentException(nameof(operationName));
-
-		if(payload is not null)
-			Payload = payload.EncodePayload().EncodeToBase64();
 
 		OperationName = operationName;
 		CreationDate = DateTime.Now;
@@ -45,7 +42,7 @@ public class TaskMessage : BaseMessage
 
 	public void SetErrorAtCurrentStep(string errorMsg)
 	{
-		CurrentStep.SetAsFailure(errorMsg);
+		CurrentStep.SetFailure(errorMsg);
 		LastUpdate = DateTime.Now;
 	}
 
@@ -54,14 +51,20 @@ public class TaskMessage : BaseMessage
 		if (value)
 		{
 			CurrentStep.SetAsInvalid();
+			Status = MessageStatus.IS_DEADLETTER;
 			LastUpdate = DateTime.Now;
 		}
 	}
 
-	public void MarkAsDeadLetter()
+	public TaskMessage SetPayload<TPayload>(TPayload payload) where TPayload : IPayload
 	{
-		Status = MessageStatus.IS_DEADLETTER;
-		LastUpdate = DateTime.Now;
+		if (payload is not null)
+		{
+			Payload = payload.EncodePayload().EncodeToBase64();
+			LastUpdate = DateTime.Now;
+		}
+
+		return this;
 	}
 
 	public TPayload? GetPayload<TPayload>() where TPayload : IPayload
@@ -72,9 +75,7 @@ public class TaskMessage : BaseMessage
 
 public enum MessageStatus
 {
-	CREATED,
 	PROCESSING = 1,
 	FINISHED,
-	FAILED,
 	IS_DEADLETTER
 }
