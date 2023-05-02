@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
-using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Shared
 {
@@ -44,7 +45,7 @@ namespace TaskProcessor.Shared
 			return (TEnum)Enum.Parse(typeof(TEnum), value, true);
 		}
 
-		public static TEnum? ToEnum<TEnum>(this int value)
+		public static TEnum ToEnum<TEnum>(this int value)
 		{
 			var name = Enum.GetName(typeof(TEnum), value);
 			return name is null ? default : name.ToEnum<TEnum>();
@@ -66,7 +67,7 @@ namespace TaskProcessor.Shared
 		public static string DecodeToString(this string text) =>
 			Convert.FromBase64String(text).DecodeBase64();
 
-		public static TPayload? DecodeToPayload<TPayload>(this string text) =>
+		public static TPayload DecodeToPayload<TPayload>(this string text) =>
 			JsonSerializer.Deserialize<TPayload>(text, JSON_OPTIONS);
 
 		public static string EncodePayload<TPayload>(this TPayload payload) =>

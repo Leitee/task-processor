@@ -1,28 +1,32 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TaskProcessor.Shared.Interfaces;
 
-namespace TaskProcessor.Shared.Engine;
-
-public class TaskDispatcher : ITaskDispatcher
+namespace TaskProcessor.Shared.Engine
 {
-	private readonly ITaskPersistence _taskPersistence;
-	private readonly ITaskPublisher _messageBroker;
-
-	public TaskDispatcher(ITaskPersistence taskPersistence, ITaskPublisher messageBroker)
+	public class TaskDispatcher : ITaskDispatcher
 	{
-		_taskPersistence = taskPersistence;
-		_messageBroker = messageBroker;
-	}
+		private readonly ITaskPersistence _taskPersistence;
+		private readonly ITaskPublisher _messageBroker;
 
-	public async Task<TaskResult> DispatchNewOperation(TaskMessage taskMessage,
-		CancellationToken cancellationToken)
-	{
-		ArgumentNullException.ThrowIfNull(taskMessage);
+		public TaskDispatcher(ITaskPersistence taskPersistence, ITaskPublisher messageBroker)
+		{
+			_taskPersistence = taskPersistence;
+			_messageBroker = messageBroker;
+		}
 
-		var persistenceResult = await _taskPersistence.SaveMessageAsync(taskMessage, cancellationToken);
+		public async Task<TaskResult> DispatchNewOperation(TaskMessage taskMessage,
+			CancellationToken cancellationToken)
+		{
+			ArgumentNullException.ThrowIfNull(taskMessage);
 
-		if (persistenceResult.TryPickT0(out var storedTaskMessage, out var errorWhenSaving))
-			return await _messageBroker.PublishMessageAsync(storedTaskMessage, cancellationToken);
+			var persistenceResult = await _taskPersistence.SaveMessageAsync(taskMessage, cancellationToken);
 
-		return errorWhenSaving;
+			if (persistenceResult.TryPickT0(out var storedTaskMessage, out var errorWhenSaving))
+				return await _messageBroker.PublishMessageAsync(storedTaskMessage, cancellationToken);
+
+			return errorWhenSaving;
+		}
 	}
 }

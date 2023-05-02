@@ -1,73 +1,75 @@
-﻿using TaskProcessor.Shared.Interfaces;
+﻿using System.Collections.Generic;
+using System.Linq;
+using TaskProcessor.Shared.Interfaces;
 
-namespace TaskProcessor.Shared.Engine;
-
-#nullable disable
-public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
+namespace TaskProcessor.Shared.Engine
 {
-	private readonly LinkedList<IExecutableStep> _taskSteps;
-
-    public IReadOnlyCollection<IExecutableStep> TaskList => _taskSteps.ToList().AsReadOnly();
-
-	public TasksEngineDefinitionBase()
+	public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 	{
-		var tempList = BuildDefinition();
-		_taskSteps = tempList?.Any() is true
-			? new LinkedList<IExecutableStep>(tempList.OrderBy(ex => ex.ExecutionOrder))
-			: throw new ExecutableStepsNotFoundException();
-	}
+		private readonly LinkedList<IExecutableStep> _taskSteps;
 
-	public abstract IEnumerable<IExecutableStep> BuildDefinition();
+		public IReadOnlyCollection<IExecutableStep> TaskList => _taskSteps.ToList().AsReadOnly();
 
-	public virtual bool TryGetNextStepTask(StepTask step, out IExecutableStep nextStepTask)
-	{
-		IExecutableStep currentTask = null;
-
-		if (step.Name is StepTask.INITIAL_STEP_NAME)
+		public TasksEngineDefinitionBase()
 		{
-			nextStepTask = _taskSteps.First.Value;
-			step.SetNextTask(nextStepTask.Name);
-		}
-		else if (!string.IsNullOrEmpty(step.Name)
-			&& !TryGetExecutableStepByName(step.Name, out currentTask))
-		{
-			throw new ExecutableStepsNotFoundException();
-		}
-		else if (currentTask?.IsLastStep is true)
-		{
-			nextStepTask = null;
-			return false;
-		}
-		else if (step.IsCompleted)
-		{
-			nextStepTask = GetNextTaskExecutableStep(currentTask);
-			step.SetNextTask(nextStepTask.Name);
-		}
-		else if (step.FailedAttempts >= currentTask.MaxRetires)
-		{
-			nextStepTask = GetFailureHandlerExecutableStep();
-		}
-		else
-		{
-			nextStepTask = currentTask;
-			return false;
+			var tempList = BuildDefinition();
+			_taskSteps = tempList?.Any() is true
+				? new LinkedList<IExecutableStep>(tempList.OrderBy(ex => ex.ExecutionOrder))
+				: throw new ExecutableStepsNotFoundException();
 		}
 
-		return true;
-	}
+		public abstract IEnumerable<IExecutableStep> BuildDefinition();
 
-	protected virtual IExecutableStep GetFailureHandlerExecutableStep()
-		=> _taskSteps.Last.Value;
+		public virtual bool TryGetNextStepTask(StepTask step, out IExecutableStep nextStepTask)
+		{
+			IExecutableStep currentTask = null;
 
-	protected virtual IExecutableStep GetNextTaskExecutableStep(IExecutableStep executableStep)
-		=> _taskSteps.Find(executableStep)?.Next?.Value;
+			if (step.Name is StepTask.INITIAL_STEP_NAME)
+			{
+				nextStepTask = _taskSteps.First.Value;
+				step.SetNextTask(nextStepTask.Name);
+			}
+			else if (!string.IsNullOrEmpty(step.Name)
+				&& !TryGetExecutableStepByName(step.Name, out currentTask))
+			{
+				throw new ExecutableStepsNotFoundException();
+			}
+			else if (currentTask?.IsLastStep is true)
+			{
+				nextStepTask = null;
+				return false;
+			}
+			else if (step.IsCompleted)
+			{
+				nextStepTask = GetNextTaskExecutableStep(currentTask);
+				step.SetNextTask(nextStepTask.Name);
+			}
+			else if (step.FailedAttempts >= currentTask.MaxRetires)
+			{
+				nextStepTask = GetFailureHandlerExecutableStep();
+			}
+			else
+			{
+				nextStepTask = currentTask;
+				return false;
+			}
 
-	protected virtual bool IsFinalStep(StepTask step)
-		=> _taskSteps.Last.ValueRef.Equals(step.Name);
+			return true;
+		}
 
-	protected virtual bool TryGetExecutableStepByName(string name, out IExecutableStep executableStep)
-	{
-		executableStep = _taskSteps.FirstOrDefault(t => t.Name == name);
-		return executableStep is not null;
+		protected virtual IExecutableStep GetFailureHandlerExecutableStep()
+			=> _taskSteps.Last.Value;
+
+		protected virtual IExecutableStep GetNextTaskExecutableStep(IExecutableStep executableStep)
+			=> _taskSteps.Find(executableStep)?.Next?.Value;
+
+		protected virtual bool IsFinalStep(StepTask step)
+			=> _taskSteps.Last.ValueRef.Equals(step.Name);
+
+		protected virtual bool TryGetExecutableStepByName(string name, out IExecutableStep executableStep)
+		{
+			executableStep = _taskSteps.FirstOrDefault(t => t.Name == name);
+			return executableStep is not null;
+		}
 	}
 }

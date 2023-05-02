@@ -1,22 +1,24 @@
+using System;
 using System.Text.Json.Serialization;
 
-namespace TaskProcessor.Shared.Engine;
-
-public abstract class BaseMessage
+namespace TaskProcessor.Shared.Engine
 {
-	protected BaseMessage()
-		: this(Guid.NewGuid(), DateTime.UtcNow) { }
-
-	[JsonConstructor]
-	protected BaseMessage(Guid id, DateTime createDate)
+	public abstract class BaseMessage
 	{
-		Id = id;
-		CreationDate = createDate;
+		protected BaseMessage()
+			: this(Guid.NewGuid(), DateTime.UtcNow) { }
+
+		[JsonConstructor]
+		protected BaseMessage(Guid id, DateTime createDate)
+		{
+			Id = id;
+			CreationDate = createDate;
+		}
+
+		[JsonInclude]
+		public Guid Id { get; init; }
+
+		[JsonInclude]
+		public DateTime CreationDate { get; init; }
 	}
-
-	[JsonInclude]
-	public Guid Id { get; init; }
-
-	[JsonInclude]
-	public DateTime CreationDate { get; init; }
 }

@@ -1,54 +1,57 @@
-﻿namespace TaskProcessor.Shared.Engine;
+﻿using System.Collections.Generic;
 
-public sealed class StepTask : ValueObject
+namespace TaskProcessor.Shared.Engine
 {
-	public const string INITIAL_STEP_NAME = "STEP_0";
-
-	public string Name { get; private set; } = INITIAL_STEP_NAME;
-	public byte Order { get; private set; } = 0;
-	public bool IsCompleted { get; private set; } = false;
-	public byte FailedAttempts { get; private set; } = 0;
-	public string ErrorMessage { get; private set; } = string.Empty;
-
-	public void SetNextTask(string stepTask)
+	public sealed class StepTask : ValueObject
 	{
-		Order++;
-		Name = stepTask;
-		IsCompleted = false;
-		FailedAttempts = 0;
-		ErrorMessage = string.Empty;
-	}
+		public const string INITIAL_STEP_NAME = "STEP_0";
 
-	public void SetAsCompleted() => IsCompleted = true;
+		public string Name { get; private set; } = INITIAL_STEP_NAME;
+		public byte Order { get; private set; } = 0;
+		public bool IsCompleted { get; private set; } = false;
+		public byte FailedAttempts { get; private set; } = 0;
+		public string ErrorMessage { get; private set; } = string.Empty;
 
-	public void SetFailure(string errorMsg)
-	{
-		FailedAttempts++;
-		ErrorMessage = errorMsg;
-	}
-
-	public void SetAsInvalid()
-	{
-		FailedAttempts = byte.MaxValue;
-	}
-
-	protected override IEnumerable<object> GetEqualityComponents()
-	{
-		yield return Name;
-		yield return Order;
-		yield return IsCompleted;
-		yield return FailedAttempts;
-	}
-
-	public StepTask Clone()
-	{
-		return new StepTask
+		public void SetNextTask(string stepTask)
 		{
-			Name = Name,
-			Order = Order,
-			IsCompleted = IsCompleted,
-			FailedAttempts = FailedAttempts,
-			ErrorMessage = ErrorMessage
-		};
+			Order++;
+			Name = stepTask;
+			IsCompleted = false;
+			FailedAttempts = 0;
+			ErrorMessage = string.Empty;
+		}
+
+		public void SetAsCompleted() => IsCompleted = true;
+
+		public void SetFailure(string errorMsg)
+		{
+			FailedAttempts++;
+			ErrorMessage = errorMsg;
+		}
+
+		public void SetAsInvalid()
+		{
+			FailedAttempts = byte.MaxValue;
+		}
+
+		protected override IEnumerable<object> GetEqualityComponents()
+		{
+			yield return Name;
+			yield return Order;
+			yield return IsCompleted;
+			yield return FailedAttempts;
+		}
+
+		public StepTask Clone()
+		{
+			return new StepTask
+			{
+				Name = Name,
+				Order = Order,
+				IsCompleted = IsCompleted,
+				FailedAttempts = FailedAttempts,
+				ErrorMessage = ErrorMessage
+			};
+		}
 	}
 }

@@ -1,6 +1,7 @@
-namespace TaskProcessor.Shared.Interfaces;
-
-public interface IPayload
+namespace TaskProcessor.Shared.Interfaces
 {
+	public interface IPayload
+	{
 
+	}
 }

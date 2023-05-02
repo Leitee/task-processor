@@ -1,10 +1,12 @@
-﻿using TaskProcessor.Shared.Engine;
+﻿using System.Collections.Generic;
+using TaskProcessor.Shared.Engine;
 
-namespace TaskProcessor.Shared.Interfaces;
-
-public interface ITaskEngineDefinition
+namespace TaskProcessor.Shared.Interfaces
 {
-    IReadOnlyCollection<IExecutableStep> TaskList { get; }
-	IEnumerable<IExecutableStep> BuildDefinition();
-	bool TryGetNextStepTask(StepTask step, out IExecutableStep nextStepTask);
+	public interface ITaskEngineDefinition
+	{
+		IReadOnlyCollection<IExecutableStep> TaskList { get; }
+		IEnumerable<IExecutableStep> BuildDefinition();
+		bool TryGetNextStepTask(StepTask step, out IExecutableStep nextStepTask);
+	}
 }

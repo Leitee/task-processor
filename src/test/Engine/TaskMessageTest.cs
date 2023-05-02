@@ -1,6 +1,4 @@
 ﻿using FluentAssertions;
-using Moq;
-using System.Text.Json;
 using TaskProcessor.Shared.Engine;
 using TaskProcessor.Shared.Interfaces;
 
@@ -46,13 +44,10 @@ namespace TaskProcessor.Shared.Tests.Engine
 		public void Should_BeInCompletedTask_WhenSetError()
 		{
 			// Arrange
-			
-
 			var operationName = "TestOperation";
 			var taskMessage = new TaskMessage(operationName);
 			var controlStep = new StepTask();
 			controlStep.SetFailure("Error");
-
 
 			// Act
 			taskMessage.SetErrorAtCurrentStep("Error1");

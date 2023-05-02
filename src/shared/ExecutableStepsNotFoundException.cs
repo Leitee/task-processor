@@ -1,9 +1,12 @@
-﻿namespace TaskProcessor.Shared;
+﻿using System;
 
-internal class ExecutableStepsNotFoundException : Exception
+namespace TaskProcessor.Shared
 {
-	public ExecutableStepsNotFoundException()
-		: base("Task are not present to start up engine.")
+	internal class ExecutableStepsNotFoundException : Exception
 	{
+		public ExecutableStepsNotFoundException()
+			: base("Task are not present to start up engine.")
+		{
+		}
 	}
 }
