@@ -22,7 +22,7 @@ internal class EnrollTaskMessageCommandHanlder : IRequestHandler<EnrollTaskMessa
 	public async Task Handle(EnrollTaskMessageCommand request, CancellationToken cancellationToken)
 	{
 		var student = new Student(request.Student);
-		var taskMessage = new TaskMessage(EnrollSubjectDefinition.OPERATION_NAME).SetPayload(student);
+		var taskMessage = new TaskMessage(EnrollStudentOperation.OPERATION_NAME).SetPayload(student);
 		await _taskDispatcher.DispatchNewOperation(taskMessage, cancellationToken);
 	}
 }

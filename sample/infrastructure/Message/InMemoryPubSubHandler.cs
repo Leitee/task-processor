@@ -3,7 +3,7 @@ using TaskProcessor.Domain.IO;
 using TaskProcessor.Shared;
 using TaskProcessor.Shared.Engine;
 
-namespace TaskProcessor.Presentation.Message;
+namespace TaskProcessor.Infrastructure.Message;
 
 public class InMemoryPubSubHandler : IPubSubHandler
 {

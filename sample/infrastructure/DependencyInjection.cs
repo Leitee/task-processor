@@ -2,6 +2,8 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TaskProcessor.Domain.IO;
+using TaskProcessor.Infrastructure.Message;
 
 namespace TaskProcessor.Infrastructure;
 public static class DependencyInjection
@@ -19,6 +21,7 @@ public static class DependencyInjection
             opt.UsingInMemory((ctx, cfg) => cfg.ConfigureEndpoints(ctx));
         });
 
+        service.AddSingleton<IPubSubHandler, InMemoryPubSubHandler>();
 
         return service;
     }

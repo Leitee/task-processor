@@ -20,7 +20,7 @@ internal class TaskEngineDefinitionInterceptor : IPipelineBehavior<ProcessTaskMe
         var taskMessage = request.TaskMessage;
         ArgumentNullException.ThrowIfNull(taskMessage);
 
-        var engineDefinition = _engineDefinitionFactory.GetEngineDefinition<EnrollSubjectDefinition>();
+        var engineDefinition = _engineDefinitionFactory.GetEngineDefinition<EnrollStudentOperation>();
         //_logger.LogInformation("Operation '{wf}' for operation '{op}'", nameof(engineDefinition), toProcess.Operation.ToString());
 
         if (!cancellationToken.IsCancellationRequested

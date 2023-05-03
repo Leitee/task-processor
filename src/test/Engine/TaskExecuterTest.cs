@@ -13,13 +13,13 @@ public class TaskExecuterTest
 
     public TaskExecuterTest()
     {
-	_publisher
-		.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-		.ReturnsAsync(TaskResult.Success)
-		.Verifiable();
+		_publisher
+			.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+			.ReturnsAsync(TaskResult.Success)
+			.Verifiable();
 
-	_sut = new TaskExecuter(_publisher.Object, NullLoggerFactory.Instance);
-    }
+		_sut = new TaskExecuter(_publisher.Object, NullLoggerFactory.Instance);
+	}
 
 	[Theory ]
 	[InlineData(false, false)]
@@ -58,7 +58,7 @@ public class TaskExecuterTest
 		.Result;
 
         result.Should().BeSuccess();
-	_publisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+		_publisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
 
 	}
 

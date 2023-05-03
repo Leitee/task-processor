@@ -1,12 +1,31 @@
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.Reflection;
+using TaskProcessor.Domain.Implementation;
+using TaskProcessor.Domain.Operations;
+using TaskProcessor.Domain.Tasks;
+using TaskProcessor.Shared.Engine;
+using TaskProcessor.Shared.Interfaces;
 
 namespace TaskProcessor.Domain;
 public static class DependencyInjection
 {
 	public static IServiceCollection AddCoreApplication(this IServiceCollection service, IConfiguration configuration)
 	{
+		service.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+		service.AddSingleton<ITaskDispatcher, TaskDispatcher>();
+		service.AddSingleton<ITaskExecuter, TaskExecuter>();
+
+		service.AddSingleton<IExecutableStep, FirstDummyTask>();
+		service.AddSingleton<IExecutableStep, SecondDummyTask>();
+		service.AddSingleton<IExecutableStep, ThirdDummyTask>();
+		service.AddSingleton<IExecutableStep, LastDummyTask>();
+
+		service.AddSingleton<ITaskEngineDefinition, EnrollStudentOperation>();
+		service.AddSingleton<TaskEngineDefinitionFactory>();
+
 		return service;
 	}
 }

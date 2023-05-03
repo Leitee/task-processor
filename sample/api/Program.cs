@@ -1,8 +1,10 @@
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 using TaskProcessor.Domain;
 using TaskProcessor.Infrastructure;
 using TaskProcessor.Presentation;
+using VisionBox.DataSynchronizer.GATEUYSISCAP2.Api.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
@@ -21,10 +23,13 @@ builder.Services.AddSwaggerGen(c =>
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddHealthChecks();
+builder.Services.AddHostedService<TaskConsumerHostedService>();
 builder.Services.AddCoreApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation(builder.Configuration);
 builder.Services.AddSwaggerGen();
+
+//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
