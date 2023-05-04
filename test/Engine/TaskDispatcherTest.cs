@@ -1,8 +1,9 @@
 ﻿using Moq;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
 
-namespace TaskProcessor.Shared.Tests.Engine;
+namespace TaskProcessor.UnitTests.Engine;
 
 public class TaskDispatcherTest
 {

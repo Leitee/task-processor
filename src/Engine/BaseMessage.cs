@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace TaskProcessor.Shared.Engine
+namespace TaskProcessor.Engine
 {
 	public abstract class BaseMessage
 	{

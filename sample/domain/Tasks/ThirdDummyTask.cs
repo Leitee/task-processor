@@ -1,7 +1,7 @@
 ﻿using TaskProcessor.Domain.Operations;
-using TaskProcessor.Shared;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
+using TaskProcessor.Common;
 
 namespace TaskProcessor.Domain.Tasks;
 
@@ -21,7 +21,12 @@ public class ThirdDummyTask : IExecutableStep
 
 	public async Task<TaskResult> ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken)
 	{
-		await Task.Delay(1000);
+		await Task.Delay(1000, cancellationToken);
 		return TaskResult.Success;
+	}
+
+	Task<TaskResult> IExecutableStep.ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken)
+	{
+		throw new NotImplementedException();
 	}
 }

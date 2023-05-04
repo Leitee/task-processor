@@ -1,18 +1,20 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
+using TaskProcessor.UnitTests;
 
-namespace TaskProcessor.Shared.Tests.Engine;
+namespace TaskProcessor.UnitTests.Engine;
 
 public class TaskExecuterTest
 {
-    private readonly ITaskExecuter _sut;
-    private readonly Mock<ITaskPublisher> _publisher = new Mock<ITaskPublisher>();
+	private readonly ITaskExecuter _sut;
+	private readonly Mock<ITaskPublisher> _publisher = new Mock<ITaskPublisher>();
 
-    public TaskExecuterTest()
-    {
+	public TaskExecuterTest()
+	{
 		_publisher
 			.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
 			.ReturnsAsync(TaskResult.Success)
@@ -21,9 +23,9 @@ public class TaskExecuterTest
 		_sut = new TaskExecuter(_publisher.Object, NullLoggerFactory.Instance);
 	}
 
-	[Theory ]
+	[Theory]
 	[InlineData(false, false)]
-	[InlineData(false, true )]
+	[InlineData(false, true)]
 	[InlineData(true, false)]
 	public async void Should_ReturnError_WhenAnyParamsIsNull(bool param1, bool param2)
 	{
@@ -43,21 +45,21 @@ public class TaskExecuterTest
 	}
 
 	[Fact]
-    public void Should_InvokePublisherOnce_WhenTaskIsNotFinal()
-    {
-        var payload = new Mock<IPayload>();
-        var taskMessage = new Mock<TaskMessage>("Operation1");
+	public void Should_InvokePublisherOnce_WhenTaskIsNotFinal()
+	{
+		var payload = new Mock<IPayload>();
+		var taskMessage = new Mock<TaskMessage>("Operation1");
 
-        var execTask = new Mock<IExecutableStep>();
-        execTask
-            .Setup(x => x.ExecuteAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(TaskResult.Success)
-            .Verifiable();
+		var execTask = new Mock<IExecutableStep>();
+		execTask
+			.Setup(x => x.ExecuteAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+			.ReturnsAsync(TaskResult.Success)
+			.Verifiable();
 
-        var result = _sut.ExecuteNextOperation(taskMessage.Object, execTask.Object, It.IsAny<CancellationToken>())
+		var result = _sut.ExecuteNextOperation(taskMessage.Object, execTask.Object, It.IsAny<CancellationToken>())
 		.Result;
 
-        result.Should().BeSuccess();
+		result.Should().BeSuccess();
 		_publisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
 
 	}

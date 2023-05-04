@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TaskProcessor.Domain.IO;
 using TaskProcessor.Infrastructure.Message;
+using TaskProcessor.Infrastructure.Persistence;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Infrastructure;
 public static class DependencyInjection
@@ -21,7 +23,9 @@ public static class DependencyInjection
             opt.UsingInMemory((ctx, cfg) => cfg.ConfigureEndpoints(ctx));
         });
 
-        service.AddSingleton<IPubSubHandler, InMemoryPubSubHandler>();
+		service.AddSingleton<ITaskPublisher, InMemoryPubSubHandler>();
+		service.AddSingleton<IPubSubHandler, InMemoryPubSubHandler>();
+        service.AddSingleton<ITaskPersistence, InMemoryTaskPersistence>();
 
         return service;
     }

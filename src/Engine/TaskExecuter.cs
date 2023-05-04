@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Interfaces;
 
-namespace TaskProcessor.Shared.Engine
+namespace TaskProcessor.Engine
 {
-	public class TaskExecuter : ITaskExecuter
+    public class TaskExecuter : ITaskExecuter
 	{
 		private readonly ITaskPublisher _publisher;
 		private readonly ILogger _logger;

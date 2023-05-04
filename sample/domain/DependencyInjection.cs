@@ -5,8 +5,8 @@ using System.Reflection;
 using TaskProcessor.Domain.Implementation;
 using TaskProcessor.Domain.Operations;
 using TaskProcessor.Domain.Tasks;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Domain;
 public static class DependencyInjection

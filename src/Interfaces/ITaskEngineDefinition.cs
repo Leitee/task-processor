@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using TaskProcessor.Shared.Engine;
+using TaskProcessor.Engine;
 
-namespace TaskProcessor.Shared.Interfaces
+namespace TaskProcessor.Interfaces
 {
 	public interface ITaskEngineDefinition
 	{

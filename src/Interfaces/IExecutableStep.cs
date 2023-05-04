@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TaskProcessor.Shared.Engine;
+using TaskProcessor.Common;
+using TaskProcessor.Engine;
 
-namespace TaskProcessor.Shared.Interfaces
+namespace TaskProcessor.Interfaces
 {
-	public interface IExecutableStep
+    public interface IExecutableStep
 	{
 		string Name { get; }
 		string OperationName { get; }

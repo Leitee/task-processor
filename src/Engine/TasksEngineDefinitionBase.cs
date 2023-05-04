@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Interfaces;
 
-namespace TaskProcessor.Shared.Engine
+namespace TaskProcessor.Engine
 {
 	public abstract class TasksEngineDefinitionBase : ITaskEngineDefinition
 	{

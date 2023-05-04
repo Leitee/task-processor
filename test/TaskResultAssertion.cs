@@ -3,8 +3,9 @@ using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using TaskProcessor.Common;
 
-namespace TaskProcessor.Shared.Tests;
+namespace TaskProcessor.UnitTests;
 
 /// <summary>
 /// Contains a number of methods to assert that a <see cref="bool"/> is in the expected state.
