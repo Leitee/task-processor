@@ -16,8 +16,4 @@
     <ProjectReference Include="..\domain\TaskProcessor.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Persistence\" />
-  </ItemGroup>
-
 </Project>

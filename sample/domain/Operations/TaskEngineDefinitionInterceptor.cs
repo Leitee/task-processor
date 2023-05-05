@@ -1,6 +1,6 @@
 ﻿using TaskProcessor.Domain.CQRS;
 using TaskProcessor.Domain.Operations;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Domain.Implementation;
 

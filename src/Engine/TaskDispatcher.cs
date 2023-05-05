@@ -1,11 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Interfaces;
 
-namespace TaskProcessor.Shared.Engine
+namespace TaskProcessor.Engine
 {
-	public class TaskDispatcher : ITaskDispatcher
+    public class TaskDispatcher : ITaskDispatcher
 	{
 		private readonly ITaskPersistence _taskPersistence;
 		private readonly ITaskPublisher _messageBroker;

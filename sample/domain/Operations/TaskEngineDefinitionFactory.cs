@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Domain.Implementation;
 

@@ -1,4 +1,4 @@
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Domain.Entities;
 public class Milestone : BaseEntity, IPayload

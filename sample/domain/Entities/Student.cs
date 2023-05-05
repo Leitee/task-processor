@@ -1,5 +1,5 @@
 ﻿using TaskProcessor.Domain.Models;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Domain.Entities;
 

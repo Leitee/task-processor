@@ -1,7 +1,7 @@
 ﻿using System.Threading.Channels;
+using TaskProcessor.Common;
 using TaskProcessor.Domain.IO;
-using TaskProcessor.Shared;
-using TaskProcessor.Shared.Engine;
+using TaskProcessor.Engine;
 
 namespace TaskProcessor.Infrastructure.Message;
 
@@ -34,7 +34,7 @@ public class InMemoryPubSubHandler : IPubSubHandler
 		}
 		catch (Exception ex)
 		{
-			return TaskResult.Failure(ex);
+			return TaskResult.ErrorFromException(ex);
 		}
 
 		return TaskResult.Success;

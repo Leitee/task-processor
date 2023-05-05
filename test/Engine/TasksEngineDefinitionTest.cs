@@ -1,9 +1,11 @@
 ﻿using FluentAssertions;
 using Moq;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
+using TaskProcessor.UnitTests;
 
-namespace TaskProcessor.Shared.Tests.Engine;
+namespace TaskProcessor.UnitTests.Engine;
 
 public class DataSynchronizerTasksEngineDefinitionTest
 {
@@ -11,7 +13,7 @@ public class DataSynchronizerTasksEngineDefinitionTest
 
 	public DataSynchronizerTasksEngineDefinitionTest()
 	{
-		_mock =  new Mock<TasksEngineDefinitionBase> { CallBase = true };
+		_mock = new Mock<TasksEngineDefinitionBase> { CallBase = true };
 	}
 
 	private static IEnumerable<IExecutableStep> CreateExecutableTasks(int qty)
@@ -25,7 +27,7 @@ public class DataSynchronizerTasksEngineDefinitionTest
 			task.SetupGet(x => x.ExecutionOrder).Returns(order);
 			task.SetupGet(x => x.Name).Returns($"Task{order}");
 			task.SetupGet(x => x.MaxRetires).Returns(2);
-			task.SetupGet(x => x.IsLastStep).Returns(index == (qty - 1));
+			task.SetupGet(x => x.IsLastStep).Returns(index == qty - 1);
 
 			result[index] = task.Object;
 		}
@@ -71,7 +73,7 @@ public class DataSynchronizerTasksEngineDefinitionTest
 
 		var controlInstance = currentStep.Clone();
 		controlInstance.SetNextTask("Task2");
-		
+
 		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
 		isNextTask.Should().BeTrue();
@@ -93,7 +95,7 @@ public class DataSynchronizerTasksEngineDefinitionTest
 		var sut = _mock.Object;
 
 		var currentStep = new StepTask();
-		currentStep.SetNextTask("Task1"); 
+		currentStep.SetNextTask("Task1");
 		currentStep.SetFailure("Error 1");
 
 		var controlInstance = currentStep.Clone();

@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
 
-namespace TaskProcessor.Shared.Tests.Engine;
+namespace TaskProcessor.UnitTests.Engine;
 
 public class TaskMessageTest
 {
@@ -39,6 +39,25 @@ public class TaskMessageTest
 		taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
 		taskMessage.CurrentStep.Should().Be(controlStep);
 	}
+
+	[Fact]
+	public void Should_BeInvalidTask_WhenMarkedAsInvalid()
+	{
+		// Arrange
+		var operationName = "TestOperation";
+		var taskMessage = new TaskMessage(operationName);
+		var controlStep = new StepTask();
+		controlStep.SetAsInvalid();
+
+		// Act
+		taskMessage.MarkCurrentTaskAsInvalid();
+
+		// Assert
+		taskMessage.Status.Should().Be(MessageStatus.IS_DEADLETTER);
+		taskMessage.CurrentStep.Should().Be(controlStep);
+	}
+
+
 
 	[Fact]
 	public void Should_BeInCompletedTask_WhenSetError()

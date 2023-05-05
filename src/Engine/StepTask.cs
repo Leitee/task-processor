@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using TaskProcessor.Common;
 
-namespace TaskProcessor.Shared.Engine
+namespace TaskProcessor.Engine
 {
-	public sealed class StepTask : ValueObject
+    public sealed class StepTask : ValueObject
 	{
 		public const string INITIAL_STEP_NAME = "STEP_0";
 

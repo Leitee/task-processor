@@ -1,10 +1,11 @@
 using System;
 using System.Text.Json.Serialization;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Common;
+using TaskProcessor.Interfaces;
 
-namespace TaskProcessor.Shared.Engine
+namespace TaskProcessor.Engine
 {
-	public class TaskMessage : BaseMessage
+    public class TaskMessage : BaseMessage
 	{
 		[JsonInclude]
 		public StepTask CurrentStep { get; private set; }

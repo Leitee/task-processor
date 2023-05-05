@@ -1,10 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using TaskProcessor.Shared.Engine;
+using TaskProcessor.Common;
+using TaskProcessor.Engine;
 
-namespace TaskProcessor.Shared.Interfaces
+namespace TaskProcessor.Interfaces
 {
-	public interface ITaskPublisher
+    public interface ITaskPublisher
 	{
 		Task<TaskResult> PublishMessageAsync(TaskMessage message, CancellationToken cancellationToken);
 	}

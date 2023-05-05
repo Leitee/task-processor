@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Reflection;
 using TaskProcessor.Domain;
 using TaskProcessor.Infrastructure;
 using TaskProcessor.Presentation;
@@ -29,7 +29,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation(builder.Configuration);
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 

@@ -1,8 +1,8 @@
 ﻿using TaskProcessor.Domain.Entities;
 using TaskProcessor.Domain.Models;
 using TaskProcessor.Domain.Operations;
-using TaskProcessor.Shared.Engine;
-using TaskProcessor.Shared.Interfaces;
+using TaskProcessor.Engine;
+using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Domain.CQRS;
 
