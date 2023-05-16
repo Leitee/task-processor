@@ -23,21 +23,25 @@ namespace TaskProcessor.Engine
 			if (taskMessage is null || executableStep is null)
 			{
 				_logger.LogError("Some parameter are null [{@msg}] and [{@exe}]", taskMessage, executableStep);
-				return TaskResult.Error;
+				return TaskResult.AsError;
 			}
 
-			_logger.LogDebug("Executing task [{taskNamee}] with the following message {@msg}",
+			_logger.LogDebug("Executing task [{taskName}] with the following message {@msg}",
 				executableStep.Name, taskMessage);
 
-			var taskCancellatiomToken = new CancellationTokenSource(executableStep.Timeout).Token;
-			var result = await executableStep.ExecuteAsync(taskMessage, taskCancellatiomToken);
+			var taskCancellationToken = new CancellationTokenSource(executableStep.Timeout).Token;
+			var result = await executableStep.ExecuteAsync(taskMessage, taskCancellationToken);
 
-			_logger.LogInformation(result.ToString());
+			if(result.TryPickInvalid(out var operationException, out TaskResult taskResult))
+			{
+				taskMessage.MarkCurrentTaskAsInvalid();
+				return TaskResult.AsError;
+			}
 
-			result.Switch(
+			taskResult.Switch(
 				ok => taskMessage.MarkCurrentStepAsCompleted(),
 				error => taskMessage.SetErrorAtCurrentStep(error.Value)
-				);
+			);
 
 			if (!executableStep.IsLastStep)
 			{
@@ -46,7 +50,7 @@ namespace TaskProcessor.Engine
 				return await _publisher.PublishMessageAsync(taskMessage, cancellationToken);
 			}
 
-			return TaskResult.Success;
+			return taskResult;
 		}
 	}
 }

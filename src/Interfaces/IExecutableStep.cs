@@ -14,6 +14,6 @@ namespace TaskProcessor.Interfaces
 		byte MaxRetires { get; }
 		bool IsLastStep { get; }
 		TimeSpan Timeout { get; }
-		Task<TaskResult> ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken);
+		Task<ExecutableStepResult> ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken);
 	}
 }

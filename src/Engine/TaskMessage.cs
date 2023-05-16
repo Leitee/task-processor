@@ -19,16 +19,18 @@ namespace TaskProcessor.Engine
 		[JsonInclude]
 		public string OperationName { get; private set; }
 
-		[JsonInclude]
+        [JsonInclude]
 		public byte[] Payload { get; private set; }
 
-		public TaskMessage(string operationName)
+		public TaskMessage(string operationName, Guid? correlationId = null)
 		{
 			if (string.IsNullOrWhiteSpace(operationName))
 				throw new ArgumentException(nameof(operationName));
 
+			if (correlationId.HasValue)
+				Id = correlationId.Value;
+
 			OperationName = operationName;
-			CreationDate = DateTime.Now;
 			CurrentStep = new StepTask();
 			Status = MessageStatus.PROCESSING;
 		}

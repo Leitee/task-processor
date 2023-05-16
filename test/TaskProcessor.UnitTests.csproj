@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	<ImplicitUsings>enable</ImplicitUsings>
+  <PropertyGroup>	  
+	<TargetFramework>net6.0</TargetFramework>
+	<ImplicitUsings>disable</ImplicitUsings>
 	<Nullable>disable</Nullable>
 	<IsPackable>false</IsPackable>
 	<IsTestProject>true</IsTestProject>
@@ -25,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\TaskProcessor.csproj" />
+    <ProjectReference Include="..\TaskProcessor\TaskProcessor.csproj" />
   </ItemGroup>
 
 </Project>
