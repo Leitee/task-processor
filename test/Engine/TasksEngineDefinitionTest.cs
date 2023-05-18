@@ -1,178 +1,182 @@
 ﻿using FluentAssertions;
 using Moq;
+using System;
+using System.Collections.Generic;
 using TaskProcessor.Common;
 using TaskProcessor.Engine;
 using TaskProcessor.Interfaces;
 using TaskProcessor.UnitTests;
+using Xunit;
 
-namespace TaskProcessor.UnitTests.Engine;
-
-public class DataSynchronizerTasksEngineDefinitionTest
+namespace TaskProcessor.UnitTests.Engine
 {
-	private Mock<TasksEngineDefinitionBase> _mock;
-
-	public DataSynchronizerTasksEngineDefinitionTest()
+	public class DataSynchronizerTasksEngineDefinitionTest
 	{
-		_mock = new Mock<TasksEngineDefinitionBase> { CallBase = true };
-	}
+		private Mock<TaskEngineDefinitionBase> _mock;
 
-	private static IEnumerable<IExecutableStep> CreateExecutableTasks(int qty)
-	{
-		IExecutableStep[] result = new IExecutableStep[qty];
-
-		for (int index = 0; index < qty; index++)
+		public DataSynchronizerTasksEngineDefinitionTest()
 		{
-			byte order = (byte)(index + 1);
-			var task = new Mock<IExecutableStep>();
-			task.SetupGet(x => x.ExecutionOrder).Returns(order);
-			task.SetupGet(x => x.Name).Returns($"Task{order}");
-			task.SetupGet(x => x.MaxRetires).Returns(2);
-			task.SetupGet(x => x.IsLastStep).Returns(index == qty - 1);
-
-			result[index] = task.Object;
+			_mock = new Mock<TaskEngineDefinitionBase>(It.IsAny< IEnumerable<IExecutableStep>>()) { CallBase = true };
 		}
 
-		return result;
-	}
+		private static IEnumerable<IExecutableStep> CreateExecutableTasks(int qty)
+		{
+			IExecutableStep[] result = new IExecutableStep[qty];
 
-	[Fact]
-	public void Should_ReturnFirstTask_When_StepIsDefault()
-	{
-		_mock
-			.Setup(x => x.BuildDefinition())
-			.Returns(CreateExecutableTasks(5))
-			.Verifiable();
+			for (int index = 0; index < qty; index++)
+			{
+				byte order = (byte)(index + 1);
+				var task = new Mock<IExecutableStep>();
+				task.SetupGet(x => x.ExecutionOrder).Returns(order);
+				task.SetupGet(x => x.Name).Returns($"Task{order}");
+				task.SetupGet(x => x.MaxRetires).Returns(2);
+				task.SetupGet(x => x.IsLastStep).Returns(index == qty - 1);
 
-		var sut = _mock.Object;
+				result[index] = task.Object;
+			}
 
-		var currentStep = new StepTask();
-		var controlInstance = currentStep.Clone();
+			return result;
+		}
 
-		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+		[Fact]
+		public void Should_ReturnFirstTask_When_StepIsDefault()
+		{
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5))
+				.Verifiable();
 
-		isNextTask.Should().BeTrue();
+			var sut = _mock.Object;
 
-		nextStepTask.Name.Should().Be("Task1");
+			var currentStep = new StepTask();
+			var controlInstance = currentStep.Clone();
 
-		currentStep.Should().NotBe(controlInstance);
-	}
+			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
-	[Fact]
-	public void Should_ReturnNextTask_When_StepIsCompleted()
-	{
-		_mock
-			.Setup(x => x.BuildDefinition())
-			.Returns(CreateExecutableTasks(5))
-			.Verifiable();
+			isNextTask.Should().BeTrue();
 
-		var sut = _mock.Object;
+			nextStepTask.Name.Should().Be("Task1");
 
-		var currentStep = new StepTask();
-		currentStep.SetNextTask("Task1");
-		currentStep.SetAsCompleted();
+			currentStep.Should().NotBe(controlInstance);
+		}
 
-		var controlInstance = currentStep.Clone();
-		controlInstance.SetNextTask("Task2");
+		[Fact]
+		public void Should_ReturnNextTask_When_StepIsCompleted()
+		{
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5))
+				.Verifiable();
 
-		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var sut = _mock.Object;
 
-		isNextTask.Should().BeTrue();
+			var currentStep = new StepTask();
+			currentStep.SetNextTask("Task1");
+			currentStep.SetAsCompleted();
 
-		currentStep.Should().BeEquivalentTo(controlInstance);
+			var controlInstance = currentStep.Clone();
+			controlInstance.SetNextTask("Task2");
 
-		nextStepTask.Name.Should().Be("Task2");
-	}
+			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+
+			isNextTask.Should().BeTrue();
+
+			currentStep.Should().BeEquivalentTo(controlInstance);
+
+			nextStepTask.Name.Should().Be("Task2");
+		}
 
 
-	[Fact]
-	public void Should_ReturnSameTask_When_NotMaxFailAttemptsReached()
-	{
-		_mock
-			.Setup(x => x.BuildDefinition())
-			.Returns(CreateExecutableTasks(5))
-			.Verifiable();
+		[Fact]
+		public void Should_ReturnSameTask_When_NotMaxFailAttemptsReached()
+		{
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5))
+				.Verifiable();
 
-		var sut = _mock.Object;
+			var sut = _mock.Object;
 
-		var currentStep = new StepTask();
-		currentStep.SetNextTask("Task1");
-		currentStep.SetFailure("Error 1");
+			var currentStep = new StepTask();
+			currentStep.SetNextTask("Task1");
+			currentStep.SetFailure("Error 1");
 
-		var controlInstance = currentStep.Clone();
+			var controlInstance = currentStep.Clone();
 
-		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
-		isNextTask.Should().BeFalse();
+			isNextTask.Should().BeFalse();
 
-		nextStepTask.Name.Should().Be("Task1");
+			nextStepTask.Name.Should().Be("Task1");
 
-		currentStep.Should().BeEquivalentTo(controlInstance);
-	}
+			currentStep.Should().BeEquivalentTo(controlInstance);
+		}
 
-	[Fact]
-	public void Should_ReturnFailureTask_When_MaxFailAttemptsReached()
-	{
-		_mock
-			.Setup(x => x.BuildDefinition())
-			.Returns(CreateExecutableTasks(5))
-			.Verifiable();
+		[Fact]
+		public void Should_ReturnFailureTask_When_MaxFailAttemptsReached()
+		{
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5))
+				.Verifiable();
 
-		var sut = _mock.Object;
+			var sut = _mock.Object;
 
-		var currentStep = new StepTask();
-		currentStep.SetNextTask("Task1");
-		currentStep.SetFailure("Error 1");
-		currentStep.SetFailure("Error 2");
+			var currentStep = new StepTask();
+			currentStep.SetNextTask("Task1");
+			currentStep.SetFailure("Error 1");
+			currentStep.SetFailure("Error 2");
 
-		var desiredStep = currentStep.Clone();
+			var desiredStep = currentStep.Clone();
 
-		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
-		isNextTask.Should().BeTrue();
+			isNextTask.Should().BeTrue();
 
-		nextStepTask.Name.Should().Be("Task5");
+			nextStepTask.Name.Should().Be("Task5");
 
-		currentStep.Should().BeEquivalentTo(desiredStep);
-	}
+			currentStep.Should().BeEquivalentTo(desiredStep);
+		}
 
-	[Fact]
-	public void Should_ReturnNoTask_When_NextTaskIsLastOne()
-	{
-		_mock
-			.Setup(x => x.BuildDefinition())
-			.Returns(CreateExecutableTasks(5))
-			.Verifiable();
+		[Fact]
+		public void Should_ReturnNoTask_When_NextTaskIsLastOne()
+		{
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5))
+				.Verifiable();
 
-		var sut = _mock.Object;
+			var sut = _mock.Object;
 
-		var currentStep = new StepTask();
-		currentStep.SetNextTask("Task5");
+			var currentStep = new StepTask();
+			currentStep.SetNextTask("Task5");
 
-		var desiredStep = currentStep.Clone();
+			var desiredStep = currentStep.Clone();
 
-		var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
-		isNextTask.Should().BeFalse();
+			isNextTask.Should().BeFalse();
 
-		nextStepTask.Should().BeNull();
-	}
+			nextStepTask.Should().BeNull();
+		}
 
-	[Fact]
-	public void Should_TrhowExecutableStepsNotFoundException_When_TaskNotFoundWithValidTaskName()
-	{
-		_mock
-			.Setup(x => x.BuildDefinition())
-			.Returns(CreateExecutableTasks(5))
-			.Verifiable();
+		[Fact]
+		public void Should_TrhowExecutableStepsNotFoundException_When_TaskNotFoundWithValidTaskName()
+		{
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5))
+				.Verifiable();
 
-		var sut = _mock.Object;
-		var currentStep = new StepTask();
-		currentStep.SetNextTask("NotExistentTask");
+			var sut = _mock.Object;
+			var currentStep = new StepTask();
+			currentStep.SetNextTask("NotExistentTask");
 
-		var desiredStep = currentStep.Clone();
+			var desiredStep = currentStep.Clone();
 
-		Func<bool> act = () => sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			Func<bool> act = () => sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
 
-		act.Should().ThrowExactly<ExecutableStepsNotFoundException>();
+			act.Should().ThrowExactly<ExecutableStepsNotFoundException>();
+		}
 	}
 }

@@ -1,88 +1,91 @@
 ﻿using Moq;
+using System.Threading;
 using TaskProcessor.Common;
 using TaskProcessor.Engine;
 using TaskProcessor.Interfaces;
+using Xunit;
 
-namespace TaskProcessor.UnitTests.Engine;
-
-public class TaskDispatcherTest
+namespace TaskProcessor.UnitTests.Engine
 {
-	private readonly Mock<ITaskPersistence> _taskPersistence = new Mock<ITaskPersistence>();
-	private readonly Mock<ITaskPublisher> _taskPublisher = new Mock<ITaskPublisher>();
-	private readonly TaskMessage _taskMessage = new TaskMessage("TestOperation");
-
-	[Fact]
-	public async void Should_DispatchNewOperation_WhenAllValid()
+	public class TaskDispatcherTest
 	{
-		// Arrange
-		_taskPersistence
-			.Setup(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(_taskMessage)
-			.Verifiable();
+		private readonly Mock<ITaskPersistence> _taskPersistence = new Mock<ITaskPersistence>();
+		private readonly Mock<ITaskPublisher> _taskPublisher = new Mock<ITaskPublisher>();
+		private readonly TaskMessage _taskMessage = new TaskMessage("TestOperation");
 
-		_taskPublisher
-			.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(TaskResult.Success)
-			.Verifiable();
+		[Fact]
+		public async void Should_DispatchNewOperation_WhenAllValid()
+		{
+			// Arrange
+			_taskPersistence
+				.Setup(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+				.ReturnsAsync(_taskMessage)
+				.Verifiable();
 
-		var taskDispatcher = new TaskDispatcher(_taskPersistence.Object, _taskPublisher.Object);
+			_taskPublisher
+				.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+				.ReturnsAsync(TaskResult.AsSuccess)
+				.Verifiable();
 
-		// Act
-		var result = await taskDispatcher.DispatchNewOperation(_taskMessage, CancellationToken.None);
+			var taskDispatcher = new TaskDispatcher(_taskPersistence.Object, _taskPublisher.Object);
 
-		// Assert
-		result.Should().BeSuccess();
-		_taskPersistence.Verify(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-		_taskPublisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-	}
+			// Act
+			var result = await taskDispatcher.DispatchNewOperation(_taskMessage, CancellationToken.None);
 
-	[Fact]
-	public async void Should_ReturnTaskError_WhenPublishReturnError()
-	{
-		// Arrange
-		_taskPersistence
-			.Setup(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(_taskMessage)
-			.Verifiable();
+			// Assert
+			result.Should().BeSuccess();
+			_taskPersistence.Verify(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+			_taskPublisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+		}
 
-		_taskPublisher
-			.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(TaskResult.Error)
-			.Verifiable();
+		[Fact]
+		public async void Should_ReturnTaskError_WhenPublishReturnError()
+		{
+			// Arrange
+			_taskPersistence
+				.Setup(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+				.ReturnsAsync(_taskMessage)
+				.Verifiable();
 
-		var taskDispatcher = new TaskDispatcher(_taskPersistence.Object, _taskPublisher.Object);
+			_taskPublisher
+				.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+				.ReturnsAsync(TaskResult.AsError)
+				.Verifiable();
 
-		// Act
-		var result = await taskDispatcher.DispatchNewOperation(_taskMessage, CancellationToken.None);
+			var taskDispatcher = new TaskDispatcher(_taskPersistence.Object, _taskPublisher.Object);
 
-		// Assert
-		result.Should().BeError();
-		_taskPersistence.Verify(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-		_taskPublisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-	}
+			// Act
+			var result = await taskDispatcher.DispatchNewOperation(_taskMessage, CancellationToken.None);
 
-	[Fact]
-	public async void Should_ReturnTaskError_WhenSaveReturnError()
-	{
-		// Arrange
-		_taskPersistence
-			.Setup(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(TaskResult.Error)
-			.Verifiable();
+			// Assert
+			result.Should().BeError();
+			_taskPersistence.Verify(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+			_taskPublisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+		}
 
-		_taskPublisher
-			.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(TaskResult.Success)
-			.Verifiable();
+		[Fact]
+		public async void Should_ReturnTaskError_WhenSaveReturnError()
+		{
+			// Arrange
+			_taskPersistence
+				.Setup(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+				.ReturnsAsync(TaskResult.AsError)
+				.Verifiable();
 
-		var taskDispatcher = new TaskDispatcher(_taskPersistence.Object, _taskPublisher.Object);
+			_taskPublisher
+				.Setup(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()))
+				.ReturnsAsync(TaskResult.AsSuccess)
+				.Verifiable();
 
-		// Act
-		var result = await taskDispatcher.DispatchNewOperation(_taskMessage, CancellationToken.None);
+			var taskDispatcher = new TaskDispatcher(_taskPersistence.Object, _taskPublisher.Object);
 
-		// Assert
-		result.Should().BeError();
-		_taskPersistence.Verify(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-		_taskPublisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Never);
+			// Act
+			var result = await taskDispatcher.DispatchNewOperation(_taskMessage, CancellationToken.None);
+
+			// Assert
+			result.Should().BeError();
+			_taskPersistence.Verify(x => x.SaveMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+			_taskPublisher.Verify(x => x.PublishMessageAsync(It.IsAny<TaskMessage>(), It.IsAny<CancellationToken>()), Times.Never);
+		}
 	}
 }

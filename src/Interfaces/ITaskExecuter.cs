@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 using TaskProcessor.Common;
 using TaskProcessor.Engine;
 
-namespace TaskProcessor.Interfaces;
-
-public interface ITaskExecuter
+namespace TaskProcessor.Interfaces
 {
-	Task<TaskResult> ExecuteNextOperation(TaskMessage taskMessage, IExecutableStep executableStep,
-		CancellationToken cancellationToken);
+	public interface ITaskExecuter
+	{
+		Task<TaskResult> ExecuteNextOperation(TaskMessage taskMessage, IExecutableStep executableStep,
+			CancellationToken cancellationToken);
+	}
 }

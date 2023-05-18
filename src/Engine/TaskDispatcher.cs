@@ -24,7 +24,7 @@ namespace TaskProcessor.Engine
 
 			var persistenceResult = await _taskPersistence.SaveMessageAsync(taskMessage, cancellationToken);
 
-			if (persistenceResult.TryPickT0(out var storedTaskMessage, out var errorWhenSaving))
+			if (persistenceResult.TryPickSuccess(out var storedTaskMessage, out var errorWhenSaving))
 				return await _messageBroker.PublishMessageAsync(storedTaskMessage, cancellationToken);
 
 			return errorWhenSaving;

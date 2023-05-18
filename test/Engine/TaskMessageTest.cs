@@ -1,97 +1,99 @@
 ﻿using FluentAssertions;
 using TaskProcessor.Engine;
 using TaskProcessor.Interfaces;
+using Xunit;
 
-namespace TaskProcessor.UnitTests.Engine;
-
-public class TaskMessageTest
+namespace TaskProcessor.UnitTests.Engine
 {
-	[Fact]
-	public void Should_CreateValidMessage_WhenInitialize()
+	public class TaskMessageTest
 	{
-		// Arrange
-		var operationName = "TestOperation";
+		[Fact]
+		public void Should_CreateValidMessage_WhenInitialize()
+		{
+			// Arrange
+			var operationName = "TestOperation";
 
-		// Act
-		var taskMessage = new TaskMessage(operationName);
+			// Act
+			var taskMessage = new TaskMessage(operationName);
 
-		// Assert
-		taskMessage.Should().NotBeNull();
-		taskMessage.Payload.Should().BeNull();
-		taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
-		taskMessage.OperationName.Should().Be(operationName);
-		taskMessage.CurrentStep.Should().Be(new StepTask());
+			// Assert
+			taskMessage.Should().NotBeNull();
+			taskMessage.Payload.Should().BeNull();
+			taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
+			taskMessage.OperationName.Should().Be(operationName);
+			taskMessage.CurrentStep.Should().Be(new StepTask());
+		}
+
+		[Fact]
+		public void Should_BeCompletedTask_WhenMarkedAsCompleted()
+		{
+			// Arrange
+			var operationName = "TestOperation";
+			var taskMessage = new TaskMessage(operationName);
+			var controlStep = new StepTask();
+			controlStep.SetAsCompleted();
+
+			// Act
+			taskMessage.MarkCurrentStepAsCompleted();
+
+			// Assert
+			taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
+			taskMessage.CurrentStep.Should().Be(controlStep);
+		}
+
+		[Fact]
+		public void Should_BeInvalidTask_WhenMarkedAsInvalid()
+		{
+			// Arrange
+			var operationName = "TestOperation";
+			var taskMessage = new TaskMessage(operationName);
+			var controlStep = new StepTask();
+			controlStep.SetAsInvalid();
+
+			// Act
+			taskMessage.MarkCurrentTaskAsInvalid();
+
+			// Assert
+			taskMessage.Status.Should().Be(MessageStatus.IS_DEADLETTER);
+			taskMessage.CurrentStep.Should().Be(controlStep);
+		}
+
+
+
+		[Fact]
+		public void Should_BeInCompletedTask_WhenSetError()
+		{
+			// Arrange
+			var operationName = "TestOperation";
+			var taskMessage = new TaskMessage(operationName);
+			var controlStep = new StepTask();
+			controlStep.SetFailure("Error");
+
+			// Act
+			taskMessage.SetErrorAtCurrentStep("Error1");
+
+			// Assert
+			taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
+			taskMessage.CurrentStep.Should().Be(controlStep);
+		}
+
+		[Fact]
+		public void Should_ReturnPayload_WhenDecoded()
+		{
+			// Arrange
+			var operationName = "TestOperation";
+			var payload = new PayloadTest("TestPayload");
+			var taskMessage = new TaskMessage(operationName).SetPayload(payload);
+
+			// Act
+			var payloadResutl = taskMessage.GetPayload<PayloadTest>();
+
+			// Assert
+			taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
+			payloadResutl.Should().Be(payload);
+			payloadResutl.Should().NotBeSameAs(payload);
+		}
 	}
 
-	[Fact]
-	public void Should_BeCompletedTask_WhenMarkedAsCompleted()
-	{
-		// Arrange
-		var operationName = "TestOperation";
-		var taskMessage = new TaskMessage(operationName);
-		var controlStep = new StepTask();
-		controlStep.SetAsCompleted();
-
-		// Act
-		taskMessage.MarkCurrentStepAsCompleted();
-
-		// Assert
-		taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
-		taskMessage.CurrentStep.Should().Be(controlStep);
-	}
-
-	[Fact]
-	public void Should_BeInvalidTask_WhenMarkedAsInvalid()
-	{
-		// Arrange
-		var operationName = "TestOperation";
-		var taskMessage = new TaskMessage(operationName);
-		var controlStep = new StepTask();
-		controlStep.SetAsInvalid();
-
-		// Act
-		taskMessage.MarkCurrentTaskAsInvalid();
-
-		// Assert
-		taskMessage.Status.Should().Be(MessageStatus.IS_DEADLETTER);
-		taskMessage.CurrentStep.Should().Be(controlStep);
-	}
-
-
-
-	[Fact]
-	public void Should_BeInCompletedTask_WhenSetError()
-	{
-		// Arrange
-		var operationName = "TestOperation";
-		var taskMessage = new TaskMessage(operationName);
-		var controlStep = new StepTask();
-		controlStep.SetFailure("Error");
-
-		// Act
-		taskMessage.SetErrorAtCurrentStep("Error1");
-
-		// Assert
-		taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
-		taskMessage.CurrentStep.Should().Be(controlStep);
-	}
-
-	[Fact]
-	public void Should_ReturnPayload_WhenDecoded()
-	{
-		// Arrange
-		var operationName = "TestOperation";
-		var payload = new PayloadTest("TestPayload");
-		var taskMessage = new TaskMessage(operationName).SetPayload(payload);
-
-		// Act
-		var payloadResutl = taskMessage.GetPayload<PayloadTest>();
-
-		// Assert
-		taskMessage.Status.Should().Be(MessageStatus.PROCESSING);
-		payloadResutl.Should().Be(payload);
-		payloadResutl.Should().NotBeSameAs(payload);
-	}
+	record PayloadTest(string Value) : IPayload;
 }
-
-record PayloadTest(string Value) : IPayload;

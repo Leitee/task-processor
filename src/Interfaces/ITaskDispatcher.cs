@@ -3,9 +3,10 @@ using System.Threading.Tasks;
 using TaskProcessor.Common;
 using TaskProcessor.Engine;
 
-namespace TaskProcessor.Interfaces;
-
-public interface ITaskDispatcher
+namespace TaskProcessor.Interfaces
 {
-	Task<TaskResult> DispatchNewOperation(TaskMessage taskMessage, CancellationToken cancellationToken);
+	public interface ITaskDispatcher
+	{
+		Task<TaskResult> DispatchNewOperation(TaskMessage taskMessage, CancellationToken cancellationToken);
+	}
 }
