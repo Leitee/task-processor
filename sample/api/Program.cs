@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using TaskProcessor.Domain;
