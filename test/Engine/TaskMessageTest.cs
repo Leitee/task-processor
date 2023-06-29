@@ -1,4 +1,8 @@
-﻿using FluentAssertions;
+﻿using Castle.DynamicProxy;
+using FluentAssertions;
+using Moq;
+using System;
+using TaskProcessor.Common;
 using TaskProcessor.Engine;
 using TaskProcessor.Interfaces;
 using Xunit;
@@ -7,6 +11,21 @@ namespace TaskProcessor.UnitTests.Engine
 {
 	public class TaskMessageTest
 	{
+		[Theory]
+		[InlineData(null)]
+		[InlineData("")]
+		public void Should_ThrowArgumentException_WhenOperationNameIsInvalid(string param)
+		{
+			// Arrange
+			var operationName = param;
+
+			// Act
+			var action = new Action(() => new TaskMessage(operationName));
+
+			// Assert
+			action.Should().Throw<ArgumentException>();
+		}
+
 		[Fact]
 		public void Should_CreateValidMessage_WhenInitialize()
 		{
@@ -25,7 +44,7 @@ namespace TaskProcessor.UnitTests.Engine
 		}
 
 		[Fact]
-		public void Should_BeCompletedTask_WhenMarkedAsCompleted()
+		public void Should_BeCompletedStep_WhenMarkedAsCompleted()
 		{
 			// Arrange
 			var operationName = "TestOperation";
@@ -42,20 +61,33 @@ namespace TaskProcessor.UnitTests.Engine
 		}
 
 		[Fact]
-		public void Should_BeInvalidTask_WhenMarkedAsInvalid()
+		public void Should_BeCompletedTask_WhenMarkedAsCompleted()
 		{
 			// Arrange
 			var operationName = "TestOperation";
 			var taskMessage = new TaskMessage(operationName);
 			var controlStep = new StepTask();
-			controlStep.SetAsInvalid();
+
+			// Act
+			taskMessage.MarkTaskAsCompleted();
+
+			// Assert
+			taskMessage.Status.Should().Be(MessageStatus.COMPLETED);
+			taskMessage.CurrentStep.Should().Be(controlStep);
+		}
+
+		[Fact]
+		public void Should_BeInvalidTask_WhenMarkedAsInvalid()
+		{
+			// Arrange
+			var operationName = "TestOperation";
+			var taskMessage = new TaskMessage(operationName);
 
 			// Act
 			taskMessage.MarkCurrentTaskAsInvalid();
 
 			// Assert
-			taskMessage.Status.Should().Be(MessageStatus.IS_DEADLETTER);
-			taskMessage.CurrentStep.Should().Be(controlStep);
+			taskMessage.Status.Should().Be(MessageStatus.DEAD_LETTERED);
 		}
 
 
@@ -93,7 +125,26 @@ namespace TaskProcessor.UnitTests.Engine
 			payloadResutl.Should().Be(payload);
 			payloadResutl.Should().NotBeSameAs(payload);
 		}
+
+		[Fact]
+		public void Should_BeValidDateTimeProvider_WhenSet()
+		{
+			// Arrange
+			var operationName = "TestOperation";
+			var referenceDateTime = DateTimeOffset.UtcNow;
+			var dateTimeProvider = new Mock<IDateTimeProvider>();
+			dateTimeProvider.Setup(x => x.UtcNow()).Returns(referenceDateTime);
+
+			// Act
+			var taskMessage = new TaskMessage(operationName, Guid.NewGuid(), dateTimeProvider.Object);
+
+			// Assert
+			taskMessage.CreationDate.Should().Be(referenceDateTime);
+		}
 	}
 
-	record PayloadTest(string Value) : IPayload;
+	record PayloadTest(string Name) : IPayload
+	{
+        public Guid CorrelationId { get; set; }
+	}
 }

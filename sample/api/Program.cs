@@ -3,7 +3,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using TaskProcessor.Domain;
 using TaskProcessor.Infrastructure;
-using TaskProcessor.Presentation;
 using VisionBox.DataSynchronizer.GATEUYSISCAP2.Api.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +25,6 @@ builder.Services.AddHealthChecks();
 builder.Services.AddHostedService<TaskConsumerHostedService>();
 builder.Services.AddCoreApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddPresentation(builder.Configuration);
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
@@ -45,7 +43,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-app.UsePresentation();
 app.UseHealthChecks("/hc");
 
 app.Run();

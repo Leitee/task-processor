@@ -30,11 +30,6 @@ namespace TaskProcessor.Engine
 			ErrorMessage = errorMsg;
 		}
 
-		public void SetAsInvalid()
-		{
-			FailedAttempts = byte.MaxValue;
-		}
-
 		protected override IEnumerable<object> GetEqualityComponents()
 		{
 			yield return Name;

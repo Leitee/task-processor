@@ -11,7 +11,7 @@ namespace TaskProcessor.Interfaces
 		string Name { get; }
 		string OperationName { get; }
 		byte ExecutionOrder { get; }
-		byte MaxRetires { get; }
+		byte MaxRetries { get; }
 		bool IsLastStep { get; }
 		TimeSpan Timeout { get; }
 		Task<ExecutableStepResult> ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken);

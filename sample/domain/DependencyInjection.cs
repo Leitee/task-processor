@@ -23,7 +23,7 @@ public static class DependencyInjection
 		service.AddSingleton<IExecutableStep, ThirdDummyTask>();
 		service.AddSingleton<IExecutableStep, LastDummyTask>();
 
-		service.AddSingleton<ITaskEngineDefinition, EnrollStudentOperation>();
+		service.AddSingleton<ITaskEngineDefinition, DummyWorkflow>();
 		service.AddSingleton<TaskEngineDefinitionFactory>();
 
 		return service;

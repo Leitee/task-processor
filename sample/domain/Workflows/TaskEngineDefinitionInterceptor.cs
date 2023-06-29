@@ -20,13 +20,13 @@ internal class TaskEngineDefinitionInterceptor : IPipelineBehavior<ProcessTaskMe
         var taskMessage = request.TaskMessage;
         ArgumentNullException.ThrowIfNull(taskMessage);
 
-        var engineDefinition = _engineDefinitionFactory.GetEngineDefinition<EnrollStudentOperation>();
+        var engineDefinition = _engineDefinitionFactory.GetEngineDefinition<DummyWorkflow>();
         //_logger.LogInformation("Operation '{wf}' for operation '{op}'", nameof(engineDefinition), toProcess.Operation.ToString());
 
         if (!cancellationToken.IsCancellationRequested
-            && engineDefinition.TryGetNextStepTask(taskMessage.CurrentStep, out IExecutableStep executableStep))
+            && engineDefinition.TryGetNextStepTask(taskMessage, out IExecutableStep executableStep))
         {
-            _logger.LogInformation("Injecting task: '{taksName}'", executableStep.Name);
+            _logger.LogInformation("Injecting task: '{taskName}'", executableStep.Name);
             request.ExecutableStep = executableStep;
             await next();
         }

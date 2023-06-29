@@ -12,8 +12,7 @@
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\presentation\TaskProcessor.Presentation.csproj" />    
+  <ItemGroup>    
     <ProjectReference Include="..\infrastructure\TaskProcessor.Infrastructure.csproj" />
   </ItemGroup>
 

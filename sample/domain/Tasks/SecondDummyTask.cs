@@ -9,19 +9,19 @@ public class SecondDummyTask : IExecutableStep
 {
 	public string Name => nameof(SecondDummyTask);
 
-	public string OperationName => nameof(EnrollStudentOperation);
+	public string OperationName => nameof(DummyWorkflow);
 
 	public byte ExecutionOrder => 2;
 
-	public byte MaxRetires => 2;
+	public byte MaxRetries => 2;
 
 	public bool IsLastStep => false;
 
 	public TimeSpan Timeout => TimeSpan.FromSeconds(10);
 
-	public async Task<TaskResult> ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken)
+	public async Task<ExecutableStepResult> ExecuteAsync(TaskMessage taskMessage, CancellationToken cancellationToken)
 	{
 		await Task.Delay(1000, cancellationToken);
-		return TaskResult.Success;
+		return ExecutableStepResult.AsSuccess;
 	}
 }

@@ -6,50 +6,42 @@ using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Engine
 {
-    public class TaskExecuter : ITaskExecuter
+	public class TaskExecuter : ITaskExecuter
 	{
-		private readonly ITaskPublisher _publisher;
 		private readonly ILogger _logger;
 
-		public TaskExecuter(ITaskPublisher publisher, ILoggerFactory loggerFactory)
+		public TaskExecuter(ILoggerFactory loggerFactory)
 		{
-			_publisher = publisher;
 			_logger = loggerFactory.CreateLogger<TaskExecuter>();
 		}
 
 		public async Task<TaskResult> ExecuteNextOperation(TaskMessage taskMessage,
 			IExecutableStep executableStep, CancellationToken cancellationToken)
 		{
-			if (taskMessage is null || executableStep is null)
-			{
-				_logger.LogError("Some parameter are null [{@msg}] and [{@exe}]", taskMessage, executableStep);
-				return TaskResult.AsError;
-			}
+			if(executableStep is null || taskMessage is null)
+				return TaskResult.ErrorFromMessage($"{nameof(executableStep)} or {nameof(taskMessage)} are null");
 
 			_logger.LogDebug("Executing task [{taskName}] with the following message {@msg}",
-				executableStep.Name, taskMessage);
+				executableStep?.Name, taskMessage);
 
 			var taskCancellationToken = new CancellationTokenSource(executableStep.Timeout).Token;
-			var result = await executableStep.ExecuteAsync(taskMessage, taskCancellationToken);
+			var execResult = await executableStep.ExecuteAsync(taskMessage, taskCancellationToken);
 
-			if(result.TryPickInvalid(out var operationException, out TaskResult taskResult))
+			if(execResult.TryPickInvalid(out var operationException, out TaskResult taskResult))
 			{
 				taskMessage.MarkCurrentTaskAsInvalid();
-				return TaskResult.AsError;
+				return TaskResult.ErrorFromMessage(operationException.Message);
 			}
 
-			taskResult.Switch(
-				ok => taskMessage.MarkCurrentStepAsCompleted(),
-				error => taskMessage.SetErrorAtCurrentStep(error.Value)
-			);
-
-			if (!executableStep.IsLastStep)
+			if(taskResult.TryPickError(out var error, out _))
 			{
-				_logger.LogInformation("Publishing - [{taskName}] as is not the last one for flow [{flow}]",
-					executableStep.Name, "Default"); // executableStep.WorkFlow.ToString());
-				return await _publisher.PublishMessageAsync(taskMessage, cancellationToken);
+				_logger.LogError("Task [{taskName}] failed with error [{error}]", executableStep.Name, error.Value);
+				taskMessage.SetErrorAtCurrentStep(error.Value);
+				return taskResult;
 			}
 
+			_logger.LogInformation("Task [{taskName}] completed successfully", executableStep.Name);
+			taskMessage.MarkCurrentStepAsCompleted();
 			return taskResult;
 		}
 	}

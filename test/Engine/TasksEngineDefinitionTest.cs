@@ -16,7 +16,23 @@ namespace TaskProcessor.UnitTests.Engine
 
 		public DataSynchronizerTasksEngineDefinitionTest()
 		{
-			_mock = new Mock<TaskEngineDefinitionBase>(It.IsAny< IEnumerable<IExecutableStep>>()) { CallBase = true };
+			var deadLetter = new Mock<IFailureStep>();
+			deadLetter.SetupGet(x => x.IsDeadLetter).Returns(true);
+
+			var failure = new Mock<IFailureStep>();
+			deadLetter.SetupGet(x => x.IsDeadLetter).Returns(false);
+
+			var failureTasks = new List<IExecutableStep> 
+			{
+				deadLetter.As<IExecutableStep>().Object, 
+				failure.As<IExecutableStep>().Object
+			};
+
+			_mock = new Mock<TaskEngineDefinitionBase>(failureTasks) { CallBase = true };
+
+			_mock
+				.Setup(x => x.BuildDefinition(null))
+				.Returns(CreateExecutableTasks(5));
 		}
 
 		private static IEnumerable<IExecutableStep> CreateExecutableTasks(int qty)
@@ -29,7 +45,7 @@ namespace TaskProcessor.UnitTests.Engine
 				var task = new Mock<IExecutableStep>();
 				task.SetupGet(x => x.ExecutionOrder).Returns(order);
 				task.SetupGet(x => x.Name).Returns($"Task{order}");
-				task.SetupGet(x => x.MaxRetires).Returns(2);
+				task.SetupGet(x => x.MaxRetries).Returns(2);
 				task.SetupGet(x => x.IsLastStep).Returns(index == qty - 1);
 
 				result[index] = task.Object;
@@ -42,29 +58,30 @@ namespace TaskProcessor.UnitTests.Engine
 		public void Should_ReturnFirstTask_When_StepIsDefault()
 		{
 			_mock
-				.Setup(x => x.BuildDefinition(null))
+				.Setup(x => x.BuildDefinition(It.IsAny<IEnumerable<IExecutableStep>>()))
 				.Returns(CreateExecutableTasks(5))
 				.Verifiable();
 
 			var sut = _mock.Object;
 
-			var currentStep = new StepTask();
-			var controlInstance = currentStep.Clone();
+			var controlInstance = new StepTask();
 
-			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var taskMessage = new TaskMessage("TestOperation", Guid.NewGuid());
+
+			var isNextTask = sut.TryGetNextStepTask(taskMessage, out IExecutableStep nextStepTask);
 
 			isNextTask.Should().BeTrue();
 
 			nextStepTask.Name.Should().Be("Task1");
 
-			currentStep.Should().NotBe(controlInstance);
+			taskMessage.CurrentStep.Should().NotBe(controlInstance);
 		}
 
 		[Fact]
 		public void Should_ReturnNextTask_When_StepIsCompleted()
 		{
 			_mock
-				.Setup(x => x.BuildDefinition(null))
+				.Setup(x => x.BuildDefinition(It.IsAny<IEnumerable<IExecutableStep>>()))
 				.Returns(CreateExecutableTasks(5))
 				.Verifiable();
 
@@ -77,7 +94,10 @@ namespace TaskProcessor.UnitTests.Engine
 			var controlInstance = currentStep.Clone();
 			controlInstance.SetNextTask("Task2");
 
-			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var taskMessage = new Mock<TaskMessage>("TestOperation", Guid.NewGuid());
+			taskMessage.SetupGet(x => x.CurrentStep).Returns(currentStep);
+
+			var isNextTask = sut.TryGetNextStepTask(taskMessage.Object, out IExecutableStep nextStepTask);
 
 			isNextTask.Should().BeTrue();
 
@@ -88,10 +108,10 @@ namespace TaskProcessor.UnitTests.Engine
 
 
 		[Fact]
-		public void Should_ReturnSameTask_When_NotMaxFailAttemptsReached()
+		public void Should_ReturnSameTask_When_TaskFailed()
 		{
 			_mock
-				.Setup(x => x.BuildDefinition(null))
+				.Setup(x => x.BuildDefinition(It.IsAny<IEnumerable<IExecutableStep>>()))
 				.Returns(CreateExecutableTasks(5))
 				.Verifiable();
 
@@ -103,9 +123,12 @@ namespace TaskProcessor.UnitTests.Engine
 
 			var controlInstance = currentStep.Clone();
 
-			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var taskMessage = new Mock<TaskMessage>("TestOperation", Guid.NewGuid());
+			taskMessage.SetupGet(x => x.CurrentStep).Returns(currentStep);
 
-			isNextTask.Should().BeFalse();
+			var isNextTask = sut.TryGetNextStepTask(taskMessage.Object, out IExecutableStep nextStepTask);
+
+			isNextTask.Should().BeTrue();
 
 			nextStepTask.Name.Should().Be("Task1");
 
@@ -113,58 +136,10 @@ namespace TaskProcessor.UnitTests.Engine
 		}
 
 		[Fact]
-		public void Should_ReturnFailureTask_When_MaxFailAttemptsReached()
+		public void Should_ThrowExecutableStepsNotFoundException_When_TaskNotFoundWithValidTaskName()
 		{
 			_mock
-				.Setup(x => x.BuildDefinition(null))
-				.Returns(CreateExecutableTasks(5))
-				.Verifiable();
-
-			var sut = _mock.Object;
-
-			var currentStep = new StepTask();
-			currentStep.SetNextTask("Task1");
-			currentStep.SetFailure("Error 1");
-			currentStep.SetFailure("Error 2");
-
-			var desiredStep = currentStep.Clone();
-
-			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
-
-			isNextTask.Should().BeTrue();
-
-			nextStepTask.Name.Should().Be("Task5");
-
-			currentStep.Should().BeEquivalentTo(desiredStep);
-		}
-
-		[Fact]
-		public void Should_ReturnNoTask_When_NextTaskIsLastOne()
-		{
-			_mock
-				.Setup(x => x.BuildDefinition(null))
-				.Returns(CreateExecutableTasks(5))
-				.Verifiable();
-
-			var sut = _mock.Object;
-
-			var currentStep = new StepTask();
-			currentStep.SetNextTask("Task5");
-
-			var desiredStep = currentStep.Clone();
-
-			var isNextTask = sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
-
-			isNextTask.Should().BeFalse();
-
-			nextStepTask.Should().BeNull();
-		}
-
-		[Fact]
-		public void Should_TrhowExecutableStepsNotFoundException_When_TaskNotFoundWithValidTaskName()
-		{
-			_mock
-				.Setup(x => x.BuildDefinition(null))
+				.Setup(x => x.BuildDefinition(It.IsAny<IEnumerable<IExecutableStep>>()))
 				.Returns(CreateExecutableTasks(5))
 				.Verifiable();
 
@@ -174,7 +149,10 @@ namespace TaskProcessor.UnitTests.Engine
 
 			var desiredStep = currentStep.Clone();
 
-			Func<bool> act = () => sut.TryGetNextStepTask(currentStep, out IExecutableStep nextStepTask);
+			var taskMessage = new Mock<TaskMessage>("TestOperation", Guid.NewGuid());
+			taskMessage.SetupGet(x => x.CurrentStep).Returns(currentStep);
+
+			Func<bool> act = () => sut.TryGetNextStepTask(taskMessage.Object, out IExecutableStep nextStepTask);
 
 			act.Should().ThrowExactly<ExecutableStepsNotFoundException>();
 		}

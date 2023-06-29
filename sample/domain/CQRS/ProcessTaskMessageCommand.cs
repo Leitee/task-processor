@@ -8,14 +8,14 @@ public record ProcessTaskMessageCommand(TaskMessage TaskMessage) : IRequest
 	public IExecutableStep? ExecutableStep { get; set; }
 }
 
-internal class ProcessTaskMessageCommandHanlder : IRequestHandler<ProcessTaskMessageCommand>
+internal class ProcessTaskMessageCommandHandler : IRequestHandler<ProcessTaskMessageCommand>
 {
 	private readonly ILogger _logger;
 	private readonly ITaskExecuter _taskDispatcher;
 
-	public ProcessTaskMessageCommandHanlder(ILoggerFactory loggerFactory, ITaskExecuter taskDispatcher)
+	public ProcessTaskMessageCommandHandler(ILoggerFactory loggerFactory, ITaskExecuter taskDispatcher)
 	{
-		_logger = loggerFactory.CreateLogger<ProcessTaskMessageCommandHanlder>();
+		_logger = loggerFactory.CreateLogger<ProcessTaskMessageCommandHandler>();
 		_taskDispatcher = taskDispatcher;
 	}
 

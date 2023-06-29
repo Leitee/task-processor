@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace TaskProcessor.Common
 {
-    public static class Helper
+    public static partial class Helper
     {
         /// <summary>
         /// Extension method to return an enum value of type TEnum for the given string.

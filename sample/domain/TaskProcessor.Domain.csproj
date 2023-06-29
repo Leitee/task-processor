@@ -6,23 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Shared\**" />
-    <Compile Remove="ValueObjects\**" />
-    <EmbeddedResource Remove="Shared\**" />
-    <EmbeddedResource Remove="ValueObjects\**" />
-    <None Remove="Shared\**" />
-    <None Remove="ValueObjects\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Models\PayloadDto.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="MediatR" />
-    <PackageReference Include="OneOf" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@ using System;
 
 namespace TaskProcessor.Common
 {
-    public class ExecutableStepResult : OneOfBase<InvalidOperationException, TaskResult>
+	public class ExecutableStepResult : OneOfBase<InvalidOperationException, TaskResult>
 	{
         protected ExecutableStepResult(OneOf<InvalidOperationException, TaskResult> input)
             : base(input)
@@ -14,7 +14,6 @@ namespace TaskProcessor.Common
 		public static TaskResult AsSuccess => TaskResult.AsSuccess;
 		public static TaskResult AsError => TaskResult.AsError;
         public static InvalidOperationException AsInvalid => new();
-
 
 		public static implicit operator ExecutableStepResult(InvalidOperationException _) => new(_);
         public static explicit operator InvalidOperationException(ExecutableStepResult _) => _.AsT0;
@@ -30,7 +29,7 @@ namespace TaskProcessor.Common
 		public override string ToString() =>
             this.AsT1.TryPickError(out Error<string> error, out _)
                 ? $"Step: '{Step}°' - Error: {error.Value}"
-                : "Task executed Sucessfuly";
+                : "Task executed Successfully";
     }
 
     public class TaskResult : TaskResult<Success>
@@ -40,19 +39,15 @@ namespace TaskProcessor.Common
         {
         }
 
-        public bool IsSuccess => base.IsT0;
-        public bool IsError => base.IsT1;
-
         public static implicit operator TaskResult(Success _) => new(_);
         public static explicit operator Success(TaskResult _) => _.AsT0;
 
         public static implicit operator TaskResult(Error<string> _) => new(_);
-        public static explicit operator Error<string>(TaskResult _) => _.AsT1; 
+        public static explicit operator Error<string>(TaskResult _) => _.AsT1;
 
 		public static Success AsSuccess => new();
     }
 
-    [GenerateOneOf]
     public class TaskResult<TResult> : OneOfBase<TResult, Error<string>>
     {
         protected TaskResult(OneOf<TResult, Error<string>> input)
@@ -66,6 +61,9 @@ namespace TaskProcessor.Common
         public static implicit operator TaskResult<TResult>(Error<string> _) => new(_);
         public static explicit operator Error<string>(TaskResult<TResult> _) => _.AsT1;
 
+        public bool IsSuccess => base.IsT0;
+        public bool IsError => base.IsT1;
+
 		public bool TryPickSuccess(out TResult value, out Error<string> remainder)
 	        => base.TryPickT0(out value, out remainder);
 
@@ -73,6 +71,7 @@ namespace TaskProcessor.Common
 	        => base.TryPickT1(out value, out remainder);
 
 		public static Error<string> AsError => new();
-        public static Error<string> ErrorFromException(Exception ex) => new(ex.Message);
+		public static Error<string> ErrorFromMessage(string msg) => new(msg);
+		public static Error<string> ErrorFromException(Exception ex) => ErrorFromMessage(ex.Message);
     }
 }

@@ -5,13 +5,14 @@ using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Engine
 {
-    public class TaskMessage : BaseMessage
+	public class TaskMessage : BaseMessage
 	{
-		[JsonInclude]
-		public StepTask CurrentStep { get; private set; }
 
 		[JsonInclude]
-		public DateTime LastUpdate { get; private set; }
+		public virtual StepTask CurrentStep { get; private set; }
+
+		[JsonInclude]
+		public DateTimeOffset LastUpdate { get; private set; }
 
 		[JsonInclude]
 		public MessageStatus Status { get; private set; }
@@ -22,13 +23,21 @@ namespace TaskProcessor.Engine
         [JsonInclude]
 		public byte[] Payload { get; private set; }
 
-		public TaskMessage(string operationName, Guid? correlationId = null)
+        public TaskMessage(string operationName) : this(operationName, Guid.NewGuid(), null)
+		{
+				
+		}
+
+        public TaskMessage(string operationName, Guid correlationId) : this(operationName, correlationId, null)
+		{
+				
+		}
+
+        public TaskMessage(string operationName, Guid? correlationId, IDateTimeProvider dateTimeProvider)
+			: base(correlationId ?? Guid.NewGuid(), dateTimeProvider)
 		{
 			if (string.IsNullOrWhiteSpace(operationName))
 				throw new ArgumentException(nameof(operationName));
-
-			if (correlationId.HasValue)
-				Id = correlationId.Value;
 
 			OperationName = operationName;
 			CurrentStep = new StepTask();
@@ -40,23 +49,31 @@ namespace TaskProcessor.Engine
 			if (value)
 			{
 				CurrentStep.SetAsCompleted();
-				LastUpdate = DateTime.Now;
+				LastUpdate = DateTimeNow;
+			}
+		}
+
+		public void MarkTaskAsCompleted(bool value = true)
+		{
+			if (value)
+			{
+				Status = MessageStatus.COMPLETED;
+				LastUpdate = DateTimeNow;
 			}
 		}
 
 		public void SetErrorAtCurrentStep(string errorMsg)
 		{
 			CurrentStep.SetFailure(errorMsg);
-			LastUpdate = DateTime.Now;
+			LastUpdate = DateTimeNow;
 		}
 
 		public void MarkCurrentTaskAsInvalid(bool value = true)
 		{
 			if (value)
 			{
-				CurrentStep.SetAsInvalid();
-				Status = MessageStatus.IS_DEADLETTER;
-				LastUpdate = DateTime.Now;
+				Status = MessageStatus.DEAD_LETTERED;
+				LastUpdate = DateTimeNow;
 			}
 		}
 
@@ -65,7 +82,7 @@ namespace TaskProcessor.Engine
 			if (payload is not null)
 			{
 				Payload = payload.EncodePayload().EncodeToBase64();
-				LastUpdate = DateTime.Now;
+				LastUpdate = DateTimeNow;
 			}
 
 			return this;
@@ -75,12 +92,5 @@ namespace TaskProcessor.Engine
 			=> Payload is not null
 			? Payload.DecodeBase64().DecodeToPayload<TPayload>()
 			: default;
-	}
-
-	public enum MessageStatus
-	{
-		PROCESSING = 1,
-		FINISHED,
-		IS_DEADLETTER
 	}
 }

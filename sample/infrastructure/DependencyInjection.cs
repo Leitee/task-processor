@@ -1,10 +1,9 @@
-using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using TaskProcessor.Domain.IO;
-using TaskProcessor.Infrastructure.Message;
-using TaskProcessor.Infrastructure.Persistence;
+using TaskProcessor.Infrastructure.Messages;
 using TaskProcessor.Interfaces;
 
 namespace TaskProcessor.Infrastructure;
@@ -25,7 +24,6 @@ public static class DependencyInjection
 
 		service.AddSingleton<ITaskPublisher, InMemoryPubSubHandler>();
 		service.AddSingleton<IPubSubHandler, InMemoryPubSubHandler>();
-        service.AddSingleton<ITaskPersistence, InMemoryTaskPersistence>();
 
         return service;
     }

@@ -5,6 +5,10 @@
         <LangVersion>preview</LangVersion>
         <Version>0.1.0</Version>
     </PropertyGroup>
+
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
   
     <PropertyGroup Label="Extra Configurarion">
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
